@@ -123,6 +123,7 @@ var config = {
             virtCanvasY = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
             levelCompArr.push(t.add.image(virtCanvasX,virtCanvasY,computers[cpuIndex]));
             var tmpSprite;
+            // Also add these to a t.physics.group()
             switch (computers[cpuIndex]) {
                 case "maccpu":
                     tmpSprite = t.physics.add.sprite(virtCanvasX - OSOFFSETX, virtCanvasY - OSOFFSETY, "apple");
@@ -179,6 +180,21 @@ var config = {
          // Original game tries to scale number of bills according to the game board dimensions
          curMaxBills = Math.min((8 + 3 * curLevel) , MAXBILLS);
          for(var i = 0 ; i < curMaxBills; i++) {
+             // 0 add bill just behind the x axis
+             // 1 add bill just behind the y axis
+             xory = Phaser.Math.Between(0,1);
+             var billStartPoint = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
+             if (xory == 0) {
+                 curBill[i] = t.physics.add.group({
+                     key: 'billL',
+                     setXY: { x: 10, y: billStartPoint }
+                 });
+             } else {
+                 curBill[i] = t.physics.add.group({
+                     key: 'billL',
+                     setXY: { y: 10, x: billStartPoint }
+                 });
+             }
          }
     }
 
