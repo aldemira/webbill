@@ -5,6 +5,8 @@ Put all the files in a web server,  and browse it!
 
 DISCLAMER: I'm neither a JS developer nor a fan of javascript. So this code isn't a state of art programming. If you don't like anything about it, feel free to send a PR!
 
+DISCLAMER++: Also what a better place to piece this software on a M$ own site as a joke. 
+
 Original Programming by:
   Main Programmer:
       Brian Wellington <bwelling@xbill.org>

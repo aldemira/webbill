@@ -31,6 +31,8 @@ var config = {
     var activeCompNum = 0;
     var deactiveCompNum = 0;
     var curHorde = '';
+    var curBill = [];
+    var levelCompArr = [];
 
     function preload ()
     {
@@ -67,12 +69,58 @@ var config = {
           this.load.atlas("billL","images/webbillL.png","images/webbillL.json");
           this.load.spritesheet("billR","/images/webbillspriteR.png", {frameWidth: 24, frameHeight: 38});
         */
-        this.load.image("billL", "images/billL_0.png");
+
+        // Can't do sprite sheets, this will do.
+        this.load.image('billD1', 'images/billD_0.png');
+        this.load.image('billD2', 'images/billD_1.png');
+        this.load.image('billD3', 'images/billD_2.png');
+        this.load.image('billD4', 'images/billD_3.png');
+        this.load.image('billD5', 'images/billD_4.png');
+
+        this.load.image("billL0", "images/billL_0.png");
+        this.load.image("billL1", "images/billL_1.png");
         this.load.image("billL2", "images/billL_2.png");
-        this.load.image("billR", "images/billR_0.png");
+        this.load.image("billR0", "images/billR_0.png");
+        this.load.image("billR1", "images/billR_1.png");
+        this.load.image("billR2", "images/billR_2.png");
+
         this.load.spritesheet("spark","images/sparksprite.png", {frameWidth: 20, frameHeight: 20});
 
         // Load animations
+        this.anims.create({
+            key: 'billRAnim',
+            frames: [
+                { key: 'billR0', frame: 0},
+                { key: 'billR1', frame: 1},
+                { key: 'billR2', frame: 2}
+            ],
+            frameRate: 2,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'billLAnim',
+            frames: [
+                { key: 'billL0', frame: 0},
+                { key: 'billL1', frame: 1},
+                { key: 'billL2', frame: 2}
+            ],
+            frameRate: 6,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'billDAnim',
+            frames: [
+                { key: 'billD1', frame: 0},
+                { key: 'billD2', frame: 1},
+                { key: 'billD3', frame: 2},
+                { key: 'billD4', frame: 3},
+                { key: 'billD5', frame: 4}
+            ],
+            frameRate: 6,
+            repeat: 0
+        });
 
         /*
         this.anims.create({
@@ -93,8 +141,23 @@ var config = {
 
     function create ()
     {
+        // Scoreboard
+        // this.add.text(5, game.config.height + 5, 'Hello World', { fontFamily: 'Georgia' });
+        // Bucket setup
+        var bucket = this.physics.add.sprite(20, 20, "bucket").setInteractive();
+        this.input.setDraggable(bucket);
+
+        this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        });
+
+        /*
+        this.input.on('dragend', function (pointer, gameObject) {
+            gameObject.clearTint();
+        });
+        */
         // Create Computers and Networks
-        var levelCompArr = [];
         // Computers to draw, formula from xbill-2.1
         var curCompNum = Math.min(8 + curLevel, maxComputers);
         activeCompNum = curCompNum;
@@ -164,9 +227,8 @@ var config = {
         }
 
         // Setup Bill horde
-        var curBill = [];
-         // curMaxBills = Math.min((8 + 3 * curLevel) * Game_scale(2));
-         // Original game tries to scale number of bills according to the game board dimensions
+        // curMaxBills = Math.min((8 + 3 * curLevel) * Game_scale(2));
+        // Original game tries to scale number of bills according to the game board dimensions
         var curMaxBills = Math.min((8 + 3 * curLevel) , MAXBILLS);
         for(var i = 0 ; i < curMaxBills; i++) {
             // 0 add bill just behind the x axis
@@ -178,15 +240,17 @@ var config = {
             var tmpWin = this.add.sprite(0, -20, 'wingdows');
             if (xory == 0) {
                 var billStartPoint = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
-                var tmpBill = this.add.sprite(0, 0, 'billR');
+                var tmpBill = this.add.sprite(0, 0, 'billR0');
                 curBill[i] = this.add.container(-30, billStartPoint, [tmpBill, tmpWin]);
                 curBill[i].setDepth(23);
             } else {
                 var billStartPoint = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
                 if ( billStartPoint >= game.config.width / 2 ) {
-                    var billImage = 'billL';
+                    var billImage = 'billL0';
+                    var billAnim = 'billLAnim';
                 } else {
-                    var billImage = 'billR';
+                    var billImage = 'billR0';
+                    var billAnim = 'billRAnim';
                 }
                 var tmpBill = this.add.sprite(0, 0, billImage);
                 curBill[i] = this.add.container(billStartPoint, -30, [tmpBill, tmpWin]);
@@ -195,18 +259,72 @@ var config = {
 
             curBill[i].setSize(28, 42);
             curBill[i].setInteractive();
+            curBill[i].setData("ingame", "false");
             this.physics.world.enable(curBill[i]);
+            curBill[i].on('pointerdown', function() {
+                // Not sorry for the pun!
+                killBill(this);
+            });
             // curBill[i].self.on('pointerdown', this.onBillClick, this);
         }
 
-        var i = Phaser.Math.Between(0, curBill.length);
-        var k = Phaser.Math.Between(0, levelCompArr.length);
-        this.physics.moveToObject(curBill[i], levelCompArr[k], 100);
-        var billCollider = this.physics.add.overlap(curBill[i], levelCompArr[k], replaceOS, null, this);
+        offScreen = curBill.length;
+        var timer = this.time.addEvent({
+            delay: 200,                // ms
+            callback: timerCallback,
+            args: [offScreen],
+            callbackScope: this,
+            loop: true
+        });
+
+    }
+
+    function killBill(myBill)
+    {
+        myBill.first.play('billDAnim');
+        myBill.body.stop();
+        if (myBill.next.texture.key == "wingdows") {
+            myBill.next.destroy();
+        }
+        myBill.first.destroy();
+    }
+
+    function timerCallback(offScreen) {
+        billLaunch(curLevel, this, offScreen);
     }
 
     function update()
     {
+        /*
+        if (offScreen > 0) {
+            score += (level * efficiency / iteration);
+        }
+        */
+    }
+
+    function billLaunch(level, t, offScreen)
+    {
+        if (offScreen == 0) {
+            return;
+        }
+
+        // Original xbill 2.1 formula
+        var minBill = Math.min(2 + level / 4, 12);
+        var n = Phaser.Math.Between(1, Math.min(minBill, offScreen));
+        console.log("Should release" + n + "Bills");
+        for (;n>0;n--) {
+            var myBill = Phaser.Utils.Array.GetRandom(curBill);
+            // console.log(myBill.getData("ingame"));
+            while(myBill.getData("ingame") == true) {
+                myBill = Phaser.Utils.Array.GetRandom(curBill);
+            }
+            myBill.setData("ingame", "true");
+            offScreen--;
+            var myCPU = Phaser.Utils.Array.GetRandom(levelCompArr);
+            // console.log(myCPU);
+            t.physics.moveToObject(myBill, myCPU, 100);
+            t.physics.add.overlap(myBill, myCPU, replaceOS, null, t);
+        }
     }
 
     function replaceOS(myBill, myCPU)
@@ -220,6 +338,10 @@ var config = {
             myBill.body.stop();
             var wingdows = myBill.next;
             var goodOS = myCPU.next;
+
+            if (goodOS == undefined || goodOS.texture.key == "wingdows") {
+               this.physics.moveTo(myBill, 100, 100);
+            }
 
             myBill.removeAt(1);
             myCPU.removeAt(1);
