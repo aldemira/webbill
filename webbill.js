@@ -11,6 +11,7 @@ var config = {
                 gravity: { z: 200 }
                 }
             },
+    // TODO: have a menu scene, with the original text.
         scene: {
             preload: preload,
             create: create,
@@ -60,15 +61,6 @@ var config = {
         this.load.image("redhat", "images/redhat.png");
         this.load.image("hurd", "images/hurd.png");
         this.load.image("os2", "images/os2.png");
-        // Load sprite sheet
-        /*
-          this.load.spritesheet("billA","images/webbillspriteA.png", {frameWidth: 58, frameHeight: 41});
-          this.load.spritesheet("billD","images/webbillspriteD.png", {frameWidth: 24, frameHeight: 38});
-          this.load.spritesheet("billRL","images/webbillspriteRL.png", {frameWidth: 58, frameHeight: 41});
-          this.load.atlas("billL","images/webbillL.png","images/webbillL.json");
-          this.load.atlas("billL","images/webbillL.png","images/webbillL.json");
-          this.load.spritesheet("billR","/images/webbillspriteR.png", {frameWidth: 24, frameHeight: 38});
-        */
 
         // Can't do sprite sheets, this will do.
         this.load.image('billD1', 'images/billD_0.png');
@@ -122,21 +114,12 @@ var config = {
             repeat: 0
         });
 
-        /*
         this.anims.create({
-            key: 'walkL',
-            frames: this.anims.generateFrameNames('billL', 
-                { 
-                    prefix: "billL_",
-                    suffix: ".png",
-                    start: 0,
-                    end: 2
-                }),
+            key: 'flame',
+            frames: this.anims.generateFrameNumbers('spark',{frames: [0, 1]}),
             frameRate: 3,
             repeat: -1
         });
-        */
-
     }
 
     function create ()
@@ -240,7 +223,7 @@ var config = {
             var tmpWin = this.add.sprite(0, -20, 'wingdows');
             if (xory == 0) {
                 var billStartPoint = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
-                var tmpBill = this.add.sprite(0, 0, 'billR0');
+                var tmpBill = this.add.image(0, 0, 'billR0');
                 curBill[i] = this.add.container(-30, billStartPoint, [tmpBill, tmpWin]);
                 curBill[i].setDepth(23);
             } else {
@@ -252,7 +235,7 @@ var config = {
                     var billImage = 'billR0';
                     var billAnim = 'billRAnim';
                 }
-                var tmpBill = this.add.sprite(0, 0, billImage);
+                var tmpBill = this.add.image(0, 0, billImage);
                 curBill[i] = this.add.container(billStartPoint, -30, [tmpBill, tmpWin]);
                 curBill[i].setDepth(23);
             }
@@ -281,12 +264,18 @@ var config = {
 
     function killBill(myBill)
     {
-        myBill.first.play('billDAnim');
         myBill.body.stop();
-        if (myBill.next.texture.key == "wingdows") {
-            myBill.next.destroy();
+        // this.physics.world.removeCollider(collider);
+        // Famous last words: we should only have two object
+        // in the contianer, Bill & payload
+        if (myBill.last.texture.key == "wingdows") {
+            myBill.last.destroy();
         }
+        myBill.first.play('billDAnim');
         myBill.first.destroy();
+        if (myBill.last == null) {
+            myBill.destroy();
+        }
     }
 
     function timerCallback(offScreen) {
@@ -315,8 +304,8 @@ var config = {
         for (;n>0;n--) {
             var myBill = Phaser.Utils.Array.GetRandom(curBill);
             // console.log(myBill.getData("ingame"));
-            while(myBill.getData("ingame") == true) {
-                myBill = Phaser.Utils.Array.GetRandom(curBill);
+            if (myBill.getData("ingame") == true) {
+                continue;
             }
             myBill.setData("ingame", "true");
             offScreen--;
@@ -340,7 +329,8 @@ var config = {
             var goodOS = myCPU.next;
 
             if (goodOS == undefined || goodOS.texture.key == "wingdows") {
-               this.physics.moveTo(myBill, 100, 100);
+                return;
+               //this.physics.moveTo(myBill, 100, 100);
             }
 
             myBill.removeAt(1);
