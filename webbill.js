@@ -218,14 +218,11 @@ var config = {
             // 1 add bill just behind the y axis
             xory = Phaser.Math.Between(0,1);
             var randComp = Phaser.Math.Between(0, computers.length);
-            var tempBody = "";
-            var tmpBill = "";
-            var tmpWin = this.add.sprite(0, -20, 'wingdows');
             if (xory == 0) {
-                var billStartPoint = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
-                var tmpBill = this.add.image(0, 0, 'billR0');
-                curBill[i] = this.add.container(-30, billStartPoint, [tmpBill, tmpWin]);
-                curBill[i].setDepth(23);
+                var billStartPointY = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+                var billStartPointX = -30;
+                var billImage = 'billR0';
+                var billAnim = 'billRAnim';
             } else {
                 var billStartPoint = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
                 if ( billStartPoint >= game.config.width / 2 ) {
@@ -235,11 +232,18 @@ var config = {
                     var billImage = 'billR0';
                     var billAnim = 'billRAnim';
                 }
-                var tmpBill = this.add.image(0, 0, billImage);
-                curBill[i] = this.add.container(billStartPoint, -30, [tmpBill, tmpWin]);
-                curBill[i].setDepth(23);
+                var billStartPointX = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+                var billStartPointY = -30;
             }
 
+            var tmpWin = this.add.image(0, -20, 'wingdows');
+            var tmpBill = this.add.sprite(0, 0, billImage);
+            tmpBill.setState(0);
+            // curBill[i] = this.add.container(billStartPointX, billStartPointY, [tmpBill, tmpWin]);
+            curBill[i] = this.add.container(billStartPointX, billStartPointY);
+            curBill[i].addAt(tmpWin, 0);
+            curBill[i].addAt(tmpBill, 1);
+            curBill[i].setDepth(23);
             curBill[i].setSize(28, 42);
             curBill[i].setInteractive();
             curBill[i].setData("ingame", "false");
@@ -267,12 +271,17 @@ var config = {
         myBill.body.stop();
         // this.physics.world.removeCollider(collider);
         // Famous last words: we should only have two object
-        // in the contianer, Bill & payload
-        if (myBill.last.texture.key == "wingdows") {
-            myBill.last.destroy();
+        // in the container, Bill & payload
+        if (myBill.getAt(0).texture.key == "wingdows") {
+            myBill.getAt(0).destroy();
         }
-        myBill.first.play('billDAnim');
-        myBill.first.destroy();
+        var tmpBill = myBill.getAt(1);
+        if (tmpBill != undefined ) {
+            tmpBill.setState(1);
+            console.log(tmpBill);
+        }
+        // tmpBill.play('billDAnim');
+        myBill.getAt(1).destroy();
         if (myBill.last == null) {
             myBill.destroy();
         }
@@ -311,6 +320,10 @@ var config = {
             offScreen--;
             var myCPU = Phaser.Utils.Array.GetRandom(levelCompArr);
             // console.log(myCPU);
+            if (myBill.getAt(1) != undefined && myBill.getAt(1).state != 0) {
+                //state 0 means bill is alive!
+                continue;
+            }
             t.physics.moveToObject(myBill, myCPU, 100);
             t.physics.add.overlap(myBill, myCPU, replaceOS, null, t);
         }
@@ -325,18 +338,18 @@ var config = {
             console.log("warning bill is replacing the OS!")
 
             myBill.body.stop();
-            var wingdows = myBill.next;
-            var goodOS = myCPU.next;
+            var wingdows = myBill.getAt(0);
+            var goodOS = myCPU.getAt(1);
 
             if (goodOS == undefined || goodOS.texture.key == "wingdows") {
                 return;
                //this.physics.moveTo(myBill, 100, 100);
             }
 
-            myBill.removeAt(1);
+            myBill.removeAt(0);
             myCPU.removeAt(1);
 
-            myBill.addAt(goodOS, 1);
+            myBill.addAt(goodOS, 0);
             myCPU.addAt(wingdows, 1);
 
             goodOS.setPosition(0, -20);
