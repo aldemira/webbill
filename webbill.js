@@ -17,6 +17,7 @@ var config = {
             create: create,
             update: update
         },
+    offScreen: 0
     };
 
     var game = new Phaser.Game(config);
@@ -79,7 +80,11 @@ var config = {
 
         this.load.spritesheet("spark","images/sparksprite.png", {frameWidth: 20, frameHeight: 20});
 
-        // Load animations
+    }
+
+    function create ()
+    {
+        // Create animations
         this.anims.create({
             key: 'billRAnim',
             frames: [
@@ -121,10 +126,7 @@ var config = {
             frameRate: 3,
             repeat: -1
         });
-    }
 
-    function create ()
-    {
         // Scoreboard
         const style = { font: "bold 20px Terminal", fill: "#000" };
         this.add.text(10, game.config.height - 50, 'Bill:%d/%d  System:%d/%d/%d  Level:' + curLevel.toString() + '  Score:' + score, style);
@@ -239,7 +241,7 @@ var config = {
             }
 
             var tmpWin = this.add.image(0, -20, 'wingdows');
-            var tmpBill = this.add.sprite(0, 0, billImage);
+            var tmpBill = this.add.sprite(0, 0, billImage).play(billAnim);
             // curBill[i] = this.add.container(billStartPointX, billStartPointY, [tmpBill, tmpWin]);
             curBill[i] = this.add.container(billStartPointX, billStartPointY);
             curBill[i].addAt(tmpWin, 0);
@@ -252,52 +254,68 @@ var config = {
             this.physics.world.enable(curBill[i]);
             curBill[i].on('pointerdown', function() {
                 var deadBill = this.getAt(1);
-                if (deadBill != undefined ) {
-                    this.setData("dead", "true");
-                } else {
+                if (deadBill == undefined ) {
                     return;
                 }
+                this.setData("dead", "true");
                 this.body.stop();
-                // this.physics.world.removeCollider(collider);
+                this.removeInteractive();
                 // Famous last words: we should only have two object
                 // in the container, Bill & payload
                 if (this.getAt(0).texture.key == "wingdows") {
-                    this.getAt(0).destroy();
-                    this.destroy();
+                    this.removeAt(0, true);
+                } else {
+                    let goodOS = this.removeAt(0, false);
+                    // TODO this animate
+                    goodOS.x = this.x;
+                    goodOS.y = this.y;
+                    goodOS.setInteractive();
+                    goodOS.setActive(true).setVisible(true);
                 }
+                console.log("aaa");
 
+                // Remove this container from available Bills
                 const index = curBill.indexOf(this);
                 if (index > -1) {
                     curBill.splice(index, 1);
                 }
 
-                // deadBill.play('billDAnim');
-                deadBill.destroy();
-                /* if (this.last == null) {
-                    this.destroy();
-                }
-                */
+                deadBill.play('billDAnim');
+               // var explosion = new billDies(this, deadBill.x, deadBill.y);
+                deadBill.once('animationcomplete', ()=>{ 
+                    console.log('animationcomplete')
+                    deadBill.setActive(false).setVisible(false);
+                    deadBill.destroy();
+                });
+
+                this.destroy();
             });
             // curBill[i].self.on('pointerdown', this.onBillClick, this);
         }
 
-        offScreen = curBill.length;
+        game.config.offScreen = curBill.length;
         var timer = this.time.addEvent({
             delay: 200,                // ms
             callback: timerCallback,
-            args: [offScreen],
+            args: [game.config.offScreen],
             callbackScope: this,
             loop: true
         });
 
     }
 
-    function timerCallback(offScreen) {
-        billLaunch(curLevel, this, offScreen);
+    function timerCallback(billsLeft) {
+        if (this.game.config.offScreen > 0) {
+            let launched = billLaunch(curLevel, this, billsLeft);
+            this.game.config.offScreen = this.game.config.offScreen - launched;
+        } else {
+            console.log("No more Bills left!")
+        }
     }
 
     function update()
     {
+        console.log(game.config.offScreen);
         /*
         if (offScreen > 0) {
             score += (level * efficiency / iteration);
@@ -305,15 +323,11 @@ var config = {
         */
     }
 
-    function billLaunch(level, t, offScreen)
+    function billLaunch(level, t, billNum)
     {
-        if (offScreen == 0) {
-            return;
-        }
-
         // Original xbill 2.1 formula
         var minBill = Math.min(2 + level / 4, 12);
-        var n = Phaser.Math.Between(1, Math.min(minBill, offScreen));
+        var n = Phaser.Math.Between(1, Math.min(minBill, billNum));
         console.log("Should release" + n + "Bills");
         for (;n>0;n--) {
             var myBill = Phaser.Utils.Array.GetRandom(curBill);
@@ -322,12 +336,13 @@ var config = {
                 continue;
             }
             myBill.setData("ingame", "true");
-            offScreen--;
             var myCPU = Phaser.Utils.Array.GetRandom(levelCompArr);
             // console.log(myBill);
             t.physics.moveToObject(myBill, myCPU, 100);
             t.physics.add.overlap(myBill, myCPU, replaceOS, null, t);
         }
+
+        return n;
     }
 
     function replaceOS(myBill, myCPU)
