@@ -34,6 +34,7 @@ var config = {
     var curHorde = '';
     var curBill = [];
     var levelCompArr = [];
+    var score = 0;
 
     function preload ()
     {
@@ -125,7 +126,8 @@ var config = {
     function create ()
     {
         // Scoreboard
-        // this.add.text(5, game.config.height + 5, 'Hello World', { fontFamily: 'Georgia' });
+        const style = { font: "bold 20px Terminal", fill: "#000" };
+        this.add.text(10, game.config.height - 50, 'Bill:%d/%d  System:%d/%d/%d  Level:' + curLevel.toString() + '  Score:' + score, style);
         // Bucket setup
         var bucket = this.physics.add.sprite(20, 20, "bucket").setInteractive();
         this.input.setDraggable(bucket);
@@ -238,7 +240,6 @@ var config = {
 
             var tmpWin = this.add.image(0, -20, 'wingdows');
             var tmpBill = this.add.sprite(0, 0, billImage);
-            tmpBill.setState(0);
             // curBill[i] = this.add.container(billStartPointX, billStartPointY, [tmpBill, tmpWin]);
             curBill[i] = this.add.container(billStartPointX, billStartPointY);
             curBill[i].addAt(tmpWin, 0);
@@ -247,10 +248,35 @@ var config = {
             curBill[i].setSize(28, 42);
             curBill[i].setInteractive();
             curBill[i].setData("ingame", "false");
+            curBill[i].setData("dead", "false");
             this.physics.world.enable(curBill[i]);
             curBill[i].on('pointerdown', function() {
-                // Not sorry for the pun!
-                killBill(this);
+                var deadBill = this.getAt(1);
+                if (deadBill != undefined ) {
+                    this.setData("dead", "true");
+                } else {
+                    return;
+                }
+                this.body.stop();
+                // this.physics.world.removeCollider(collider);
+                // Famous last words: we should only have two object
+                // in the container, Bill & payload
+                if (this.getAt(0).texture.key == "wingdows") {
+                    this.getAt(0).destroy();
+                    this.destroy();
+                }
+
+                const index = curBill.indexOf(this);
+                if (index > -1) {
+                    curBill.splice(index, 1);
+                }
+
+                // deadBill.play('billDAnim');
+                deadBill.destroy();
+                /* if (this.last == null) {
+                    this.destroy();
+                }
+                */
             });
             // curBill[i].self.on('pointerdown', this.onBillClick, this);
         }
@@ -264,27 +290,6 @@ var config = {
             loop: true
         });
 
-    }
-
-    function killBill(myBill)
-    {
-        myBill.body.stop();
-        // this.physics.world.removeCollider(collider);
-        // Famous last words: we should only have two object
-        // in the container, Bill & payload
-        if (myBill.getAt(0).texture.key == "wingdows") {
-            myBill.getAt(0).destroy();
-        }
-        var tmpBill = myBill.getAt(1);
-        if (tmpBill != undefined ) {
-            tmpBill.setState(1);
-            console.log(tmpBill);
-        }
-        // tmpBill.play('billDAnim');
-        myBill.getAt(1).destroy();
-        if (myBill.last == null) {
-            myBill.destroy();
-        }
     }
 
     function timerCallback(offScreen) {
@@ -313,17 +318,13 @@ var config = {
         for (;n>0;n--) {
             var myBill = Phaser.Utils.Array.GetRandom(curBill);
             // console.log(myBill.getData("ingame"));
-            if (myBill.getData("ingame") == true) {
+            if (myBill == null || myBill.getData("ingame") == true || myBill.getData("dead") == true) {
                 continue;
             }
             myBill.setData("ingame", "true");
             offScreen--;
             var myCPU = Phaser.Utils.Array.GetRandom(levelCompArr);
-            // console.log(myCPU);
-            if (myBill.getAt(1) != undefined && myBill.getAt(1).state != 0) {
-                //state 0 means bill is alive!
-                continue;
-            }
+            // console.log(myBill);
             t.physics.moveToObject(myBill, myCPU, 100);
             t.physics.add.overlap(myBill, myCPU, replaceOS, null, t);
         }
