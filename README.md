@@ -1,5 +1,7 @@
 This is an attempt to port original xbill-2.1 to Phaser3. I've decided to use original artwork as I'm not a graphics designer and lack those skills.
 
+WARNING: This is still incomplete and work-in-progress.
+
 INSTALLATION: 
 Put all the files in a web server,  and browse it!
 
