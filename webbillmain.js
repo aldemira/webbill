@@ -10,7 +10,7 @@ const config = {
         default: 'arcade'
     },
     scene: [ gameMenu ],
-    offScreen: 0
+    version: 0.1
     };
 
 let game = new Phaser.Game(config);
