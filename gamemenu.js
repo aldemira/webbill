@@ -12,6 +12,7 @@ class gameMenu extends baseScene
         this.load.image("terminal", "images/terminal2.png");
         this.load.audio("hdd", "sounds/hdd_sound.ogg");
         this.load.audio("modem", "sounds/modem.ogg");
+        this.load.image('about', 'images/about.png');
     }
 
     create()
@@ -29,9 +30,6 @@ class gameMenu extends baseScene
         let container2 = this.add.container((myWidth / 2 ) + 200, myHeight * 0.2, [win2, bill2]);
         this.add.image(myWidth / 2, myHeight / 2 + 50, 'terminal').setDepth(0);
 
-
-        // const textStyle = { font: "bold 30px Courier Mono", fill: "#4af626" };
-        // const textStyle = { font: "bold 30px MMBNThin", fill: "#4af626" };
         const textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", fixedWidth: 370, backgroundColor: '#fff' };
         let startButton = this.add.text((myWidth / 2) - 40 , (myHeight / 2) - 50, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0.5)
@@ -52,30 +50,60 @@ class gameMenu extends baseScene
             .on('pointerout', () => rulesButton.setStyle({ fill: '#4af626' }));
 
         let myContext = this;
+        /*
         rulesButton.on('pointerdown', function() {
             let tempConsole = myContext.add.image(myWidth / 2, myHeight / 2 + 100, 'terminal').setDepth(3);
         });
+        */
 
         let aboutButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 90, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0.5)
             .setPadding(10)
             .setDepth(1)
             .setInteractive({ useHandCursor: true})
-            .on('pointerdown', this.showAbout)
             .on('pointerover', () => aboutButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => aboutButton.setStyle({ fill: '#4af626' }));
+
+        let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
+            .setOrigin(0.5)
+            .setPadding(10)
+            .setDepth(1)
+            .setStyle({border: 1, fontSize: 18})
+            .setInteractive({ useHandCursor: true})
+            .setVisible(false)
+            .on('pointerover', () => aboutButton.setStyle({ fill: '#f39c12' }))
+            .on('pointerout', () => aboutButton.setStyle({ fill: '#4af626' }));
+
+        let aboutimg = myContext.add.image((myWidth / 2) - 40, (myHeight / 2) + 40, 'about').setDepth(5).setVisible(false);
+
+        okButton.on('pointerdown', function() {
+            this.setVisible(false);
+            aboutimg.setVisible(false);
+            startButton.setVisible(true);
+            rulesButton.setVisible(true);
+            aboutButton.setVisible(true);
+        });
+
+        aboutButton.on('pointerdown', function() {
+            aboutimg.setVisible(true);
+            okButton.setVisible(true);
+            startButton.setVisible(false);
+            rulesButton.setVisible(false);
+            aboutButton.setVisible(false);
+        });
 
         this.sound.play('hdd',{
             loop: true
         });
 
         var timer = this.time.addEvent({
-            delay: Phaser.Math.Between(200,2000),
+            delay: Phaser.Math.Between(400,2500),
             callback: function() { this.sound.play('modem'); },
             args: [],
             callbackScope: this,
             loop: false
         });
+
 
         this.typewriteText('Start Game', startButton);
         this.typewriteText('Rules', rulesButton);
