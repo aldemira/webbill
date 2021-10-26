@@ -209,6 +209,7 @@ var config = {
             levelCompArr[tComp2ID].setDepth(10);
 
             var myLine =  new Phaser.Geom.Line(levelCompArr[tComp1ID].x, levelCompArr[tComp1ID].y, levelCompArr[tComp2ID].x, levelCompArr[tComp2ID].y);
+            this.add.path(myLine);
             var graphics = this.add.graphics({ lineStyle: { width: 3, color: 0xaa00aa } });
             graphics.strokeLineShape(myLine);
         }
