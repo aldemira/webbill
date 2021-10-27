@@ -20,6 +20,8 @@ class gameMenu extends baseScene
         super.create();
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
+        // Need to pass this to functions and whatnot
+        let myContext = this;
         this.add.image(myWidth / 2, myHeight * 0.2, 'logo').setDepth(1);
         // TODO move these into a billSprite class
         let bill1 = this.add.sprite(0, 0, 'billL0').play('billLAnim');
@@ -36,7 +38,7 @@ class gameMenu extends baseScene
             .setPadding(10)
             .setDepth(1)
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.startGame)
+            .on('pointerdown', this.startGame(myContext))
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
@@ -49,7 +51,6 @@ class gameMenu extends baseScene
             .on('pointerover', () => rulesButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => rulesButton.setStyle({ fill: '#4af626' }));
 
-        let myContext = this;
         /*
         rulesButton.on('pointerdown', function() {
             let tempConsole = myContext.add.image(myWidth / 2, myHeight / 2 + 100, 'terminal').setDepth(3);
@@ -114,9 +115,9 @@ class gameMenu extends baseScene
     {
     }
 
-    startGame()
+    startGame(t)
     {
-        console.log("start");
+        t.scene.start('webBill');
     }
 
     typewriteText(text, obj)
@@ -125,12 +126,31 @@ class gameMenu extends baseScene
         let i = 0
         this.time.addEvent({
             callback: () => {
-                obj.text += text[i]
+                obj.text = obj.text.slice(0, -1);
+                // obj.text += text[i] + "\u{220e}";
+                obj.text += text[i] + "_";
                 ++i
             },
             repeat: length - 1,
             delay: 200
         })
+    }
+
+    blinkCursor(obj)
+    {
+
+        // Simple cursor blink action
+        this.time.addEvent({
+            callback: () => {
+                if (obj.text.charAt(obj.text.length - 1) == '_' ) {
+                    obj.text = obj.text.slice(0, -1);
+                } else {
+                    obj.text += '_';
+                }
+            },
+            repeat: -1,
+            delay: 700,
+        });
     }
 
     showRules()

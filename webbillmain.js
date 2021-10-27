@@ -9,7 +9,7 @@ const config = {
     physics: {
         default: 'arcade'
     },
-    scene: [ gameMenu ],
+    scene: [ gameMenu, webBill ],
     version: 0.1
     };
 
