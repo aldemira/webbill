@@ -95,9 +95,6 @@ class webBill extends baseScene
             repeat: -1
         });
 
-        // Scoreboard
-        const style = { font: "bold 20px Terminal", fill: "#000" };
-        this.add.text(10, game.config.height - 50, 'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score, style);
         // Bucket setup
         var bucket = this.physics.add.sprite(20, 20, "bucket").setInteractive();
         this.input.setDraggable(bucket);
@@ -179,11 +176,9 @@ class webBill extends baseScene
                 this.levelCompArr[tComp1ID].y,
                 this.levelCompArr[tComp2ID].x,
                 this.levelCompArr[tComp2ID].y);
-            /*
-            this.add.path(myLine);
-            var graphics = this.add.graphics({ lineStyle: { width: 3, color: 0xaa00aa } });
-            graphics.strokeLineShape(myLine);
-            */
+            // this.add.path(myLine);
+            var netGraphics = this.add.graphics({ lineStyle: { width: 3, color: 0xaa00aa } });
+            netGraphics.strokeLineShape(myLine);
         }
 
         // Setup Bill horde
@@ -248,10 +243,13 @@ class webBill extends baseScene
                 console.log("aaa");
 
                 // Remove this container from available Bills
-                const index = this.curBill.indexOf(this);
+                // TODO find a way to fetch the bill array
+                /*
+                const index = this.parent.indexOf(this);
                 if (index > -1) {
-                    this.curBill.splice(index, 1);
+                    this.parent.splice(index, 1);
                 }
+                */
 
                 deadBill.play('billDAnim');
                // var explosion = new billDies(this, deadBill.x, deadBill.y);
@@ -275,6 +273,7 @@ class webBill extends baseScene
             loop: true
         });
 
+        const menuStyle = {fontFamily: "Menlo Regular", fontSize: 12, fill: "#000"};
         let bottomBarGraph = this.add.graphics();
         let alpha = 0.5 + ((0 / 10) * 0.5);
         let bottomBar = this.add.container(0, game.config.height);
@@ -283,7 +282,9 @@ class webBill extends baseScene
         let outerRect = bottomBarGraph.fillRect(0, -40, game.config.width, 40);
         bottomBar.add(outerRect);
 
-        let menuStyle = {fontFamily: "Menlo Regular", fontSize: 12, fill: "#000"};
+        // Scoreboard
+        let scoreText = this.add.text(60,-20, 'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score, menuStyle);
+        bottomBar.add(scoreText);
         let menuText = this.add.image(25, -20, "xlogo").setDisplaySize(25,20).setDepth(1);
         bottomBar.add(menuText);
         bottomBarGraph.lineStyle(2, 0x000000, 1);
@@ -334,7 +335,7 @@ class webBill extends baseScene
             .setDisplaySize(24,24));
 
         menuText.setInteractive()
-            .on('pointerdown', () => {startContainer.setVisible(!startContainer.visible)}, this);
+            .on('pointerdown', () => {startContainer.setVisible(!startContainer.visible); this.scene.pause(startContainer.visible);}, this);
 
     }
 
