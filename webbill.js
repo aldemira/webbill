@@ -19,6 +19,9 @@ class webBill extends baseScene
         this.curBill = [];
         this.levelCompArr = [];
         this.score = 0;
+        this.timeString = ':';
+        this.timeText = '';
+        this.volImg = '';
     }
 
     preload()
@@ -26,6 +29,10 @@ class webBill extends baseScene
         super.preload();
         // Load sounds
         this.load.audio("winding", "sounds/win31.mp3");
+
+        // Load start menu related items
+        this.load.image("xlogo", "images/X11.svg");
+        this.load.image("shutdown", "images/shutdown.png");
 
         // Load CPU images
         this.load.image("maccpu", "images/maccpu.png");
@@ -66,6 +73,8 @@ class webBill extends baseScene
     create()
     {
         super.create();
+
+        // Scene specific animations
         this.anims.create({
             key: 'billDAnim',
             frames: [
@@ -266,6 +275,67 @@ class webBill extends baseScene
             loop: true
         });
 
+        let bottomBarGraph = this.add.graphics();
+        let alpha = 0.5 + ((0 / 10) * 0.5);
+        let bottomBar = this.add.container(0, game.config.height);
+        bottomBarGraph.fillStyle(0x787878, alpha);
+        // let outerRect = graphics.fillRect(0, game.config.height - 40, game.config.width, 40);
+        let outerRect = bottomBarGraph.fillRect(0, -40, game.config.width, 40);
+        bottomBar.add(outerRect);
+
+        let menuStyle = {fontFamily: "Menlo Regular", fontSize: 12, fill: "#000"};
+        let menuText = this.add.image(25, -20, "xlogo").setDisplaySize(25,20).setDepth(1);
+        bottomBar.add(menuText);
+        bottomBarGraph.lineStyle(2, 0x000000, 1);
+        let menuOuterRect = bottomBarGraph.strokeRect(2, -35, 50, 30).setDepth(2);
+        bottomBar.add(menuOuterRect);
+        bottomBarGraph.lineStyle(2, 0xffffff, 0.5);
+        let menuOuterRectShadow = bottomBarGraph.strokeRect(2, -33, 48, 28).setDepth(3);
+        bottomBar.add(menuOuterRectShadow);
+
+        this.timeText = this.add.text(game.config.width - 50, -25, this.timeString, menuStyle).setDepth(2);
+        bottomBar.add(this.timeText);
+
+
+        this.updateTime();
+        let clockTimer = this.time.addEvent({
+            delay: 60000,
+            callback: this.updateTime,
+            callbackScope: this,
+            loop: true
+        });
+
+        let myIcon = '';
+        if (this.sound.mute) {
+            myIcon = "volume-mute";
+        } else {
+            myIcon = "volume-unmute";
+        }
+
+        this.volImg = this.add.image(game.config.width-70, -20, myIcon)
+            .setDisplaySize(24,24)
+            .setInteractive()
+            .setDepth(2)
+            .on('pointerdown', this.muteSound, this);
+        bottomBar.add(this.volImg);
+
+        let menuGraph = this.add.graphics();
+        menuGraph.fillStyle(0x787878, alpha);
+        // startContainer = this.add.container(5,game.config.height-100);
+        let startContainer = this.add.container(2,game.config.height-202).setVisible(false);
+        let startMenu = menuGraph.fillRect(0, -40, 100, 200);
+        startContainer.add(startMenu);
+        startContainer.add(this.add.text(30, 138, "Shutdown", menuStyle)
+            .setInteractive()
+            .on('pointerdown', () => {this.scene.start('gameMenu')}));
+        startContainer.add(this.add.image(15,145, "shutdown")
+            .setInteractive()
+            .on('pointerdown', () => {this.scene.start('gameMenu')})
+            .setDisplaySize(24,24));
+
+        menuText.setInteractive()
+            .on('pointerdown', () => {startContainer.setVisible(!startContainer.visible)}, this);
+
     }
 
     timerCallback(billsLeft) {
@@ -353,6 +423,34 @@ class webBill extends baseScene
         }
     }
 
+    updateTime() {
+        let time = new Date();
+
+        let hours = time.getHours();
+        let minutes = time.getMinutes();
+
+        if (hours < 10) {
+                hours = "0" + hours;
+            }
+        if (minutes < 10) {
+                minutes = "0" + minutes;
+        }
+
+        this.timeString = hours + ":" + minutes;
+        this.timeText.text = this.timeString;
+    }
+
+    muteSound()
+    {
+        let myIcon = '';
+        game.sound.mute = !game.sound.mute;
+        if (game.sound.mute) {
+            myIcon = "volume-mute";
+        } else {
+            myIcon = "volume-unmute";
+        }
+        this.volImg.setTexture(myIcon);
+    }
 
     hordeSetup(t, curLevel)
     {

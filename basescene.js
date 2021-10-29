@@ -14,6 +14,8 @@ class baseScene extends Phaser.Scene
         this.load.image("billR1", "images/billR_1.png");
         this.load.image("billR2", "images/billR_2.png");
         this.load.image("wingdows", "images/wingdows.png");
+        this.load.image("volume-unmute", "images/volume-high.png");
+        this.load.image("volume-mute", "images/volume-muted.png");
     }
 
     create()

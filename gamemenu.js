@@ -38,7 +38,7 @@ class gameMenu extends baseScene
             .setPadding(10)
             .setDepth(1)
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.startGame(myContext))
+            .on('pointerdown', () => this.scene.start('webBill'))
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
@@ -113,11 +113,6 @@ class gameMenu extends baseScene
 
     update()
     {
-    }
-
-    startGame(t)
-    {
-        t.scene.start('webBill');
     }
 
     typewriteText(text, obj)
