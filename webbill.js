@@ -9,8 +9,8 @@ class webBill extends baseScene
         this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
         this.curLevel = 1;
         this.MINPC = 6;
-        this.OSOFFSETX = 9;
-        this.OSOFFSETY = 7;
+        this.OSOFFSETX = -9;
+        this.OSOFFSETY = -7;
         this.MAXBILLS = 100;
         this.activeComp = '';
         this.activeCompNum = 0;
@@ -22,6 +22,7 @@ class webBill extends baseScene
         this.timeString = ':';
         this.timeText = '';
         this.volImg = '';
+        this.offScreen = 0;
     }
 
     preload()
@@ -129,32 +130,32 @@ class webBill extends baseScene
             this.levelCompArr[i] = this.add.container(virtCanvasX,virtCanvasY, [ tmpComp ]);
             switch (this.computers[cpuIndex]) {
                 case "maccpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "apple")
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "apple")
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "bsdcpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "bsd");
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "bsd");
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "nextcpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "next");
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "next");
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "palmcpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "palm");
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "palm");
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "sgicpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "sgi");
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "sgi");
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "suncpu":
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, "sun");
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "sun");
                     this.levelCompArr[i].add(tmpOS);
                     break;
                 case "os2cpu":
                     var pcos = Phaser.Math.Between(6, this.os.length)
-                    tmpOS = this.add.sprite(-this.OSOFFSETX, -this.OSOFFSETY, this.os[pcos]);
+                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, this.os[pcos]);
                     this.levelCompArr[i].add(tmpOS);
                     break;
             }
@@ -172,13 +173,15 @@ class webBill extends baseScene
             this.levelCompArr[tComp1ID].setDepth(10);
             this.levelCompArr[tComp2ID].setDepth(10);
 
-            let myLine =  new Phaser.Geom.Line(this.levelCompArr[tComp1ID].x, 
+            // let myLine =  new Phaser.Geom.Line(this.levelCompArr[tComp1ID].x, 
+            let myLine =  new Phaser.Curves.Line([this.levelCompArr[tComp1ID].x, 
                 this.levelCompArr[tComp1ID].y,
                 this.levelCompArr[tComp2ID].x,
-                this.levelCompArr[tComp2ID].y);
-            // this.add.path(myLine);
+                this.levelCompArr[tComp2ID].y]);
+            let tempPath = this.add.path();
+            tempPath.add(myLine);
             var netGraphics = this.add.graphics({ lineStyle: { width: 3, color: 0xaa00aa } });
-            netGraphics.strokeLineShape(myLine);
+            tempPath.draw(netGraphics);
         }
 
         // Setup Bill horde
@@ -264,11 +267,11 @@ class webBill extends baseScene
             // this.curBill[i].self.on('pointerdown', this.onBillClick, this);
         }
 
-        game.config.offScreen = this.curBill.length;
+        this.offScreen = curMaxBills;
         var timer = this.time.addEvent({
             delay: 200,                // ms
             callback: this.timerCallback,
-            args: [game.config.offScreen],
+            args: [],
             callbackScope: this,
             loop: true
         });
@@ -339,10 +342,11 @@ class webBill extends baseScene
 
     }
 
-    timerCallback(billsLeft) {
-        if (this.game.config.offScreen > 0) {
-            let launched = this.billLaunch(this.curLevel, this, billsLeft);
-            this.game.config.offScreen = this.game.config.offScreen - launched;
+    timerCallback() {
+        if (this.offScreen > 0) {
+            let launched = this.billLaunch(this.curLevel, this);
+            console.log("Launched:" + launched);
+            this.offScreen = this.offScreen - launched;
         } else {
             console.log("No more Bills left!")
         }
@@ -351,7 +355,7 @@ class webBill extends baseScene
     update()
     {
         super.update();
-        console.log(game.config.offScreen);
+        console.log(this.offScreen);
         /*
         if (offScreen > 0) {
             score += (level * efficiency / iteration);
@@ -359,12 +363,13 @@ class webBill extends baseScene
         */
     }
 
-    billLaunch(level, t, billNum)
+    billLaunch(level, t)
     {
         // Original xbill 2.1 formula
         var minBill = Math.min(2 + level / 4, 12);
-        var n = Phaser.Math.Between(1, Math.min(minBill, billNum));
+        var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreen));
         console.log("Should release" + n + "Bills");
+        let retVal = n;
         for (;n>0;n--) {
             var myBill = Phaser.Utils.Array.GetRandom(this.curBill);
             // console.log(myBill.getData("ingame"));
@@ -374,11 +379,11 @@ class webBill extends baseScene
             myBill.setData("ingame", "true");
             var myCPU = Phaser.Utils.Array.GetRandom(this.levelCompArr);
             // console.log(myBill);
-            t.physics.moveToObject(myBill, myCPU, 100);
+            t.physics.moveToObject(myBill, myCPU, 20);
             t.physics.add.overlap(myBill, myCPU, t.replaceOS, null, t);
         }
 
-        return n;
+        return retVal;
     }
 
     replaceOS(myBill, myCPU)
@@ -405,7 +410,7 @@ class webBill extends baseScene
             myCPU.addAt(wingdows, 1);
 
             goodOS.setPosition(0, -20);
-            wingdows.setPosition(-this.OSOFFSETX, -this.OSOFFSETY);
+            wingdows.setPosition(this.OSOFFSETX, this.OSOFFSETY);
 
             this.sound.play('winding');
 
@@ -421,6 +426,7 @@ class webBill extends baseScene
             }
 
             this.physics.moveTo(myBill, x, y, 20);
+            //this.physics.remove.overlap(myBill, myCPU);
         }
     }
 
