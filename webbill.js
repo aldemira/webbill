@@ -41,6 +41,10 @@ class webBill extends baseScene
         this.timeText = '';
         this.volImg = '';
         this.offScreen = 0;
+        this.billTimer = '';
+        this.efficiency = 1;
+        this.iteration = 1;
+        this.aliveBills = 0;
     }
 
     preload()
@@ -230,7 +234,7 @@ class webBill extends baseScene
             }
 
             var tmpWin = this.add.image(0, -20, 'wingdows');
-            var tmpBill = this.add.sprite(0, 0, billImage).play(billAnim);
+            let tmpBill = this.add.sprite(0, 0, billImage).play(billAnim);
             // curBill[i] = this.add.container(billStartPointX, billStartPointY, [tmpBill, tmpWin]);
             this.curBill[i] = this.add.container(billStartPointX, billStartPointY);
             this.curBill[i].addAt(tmpWin, 0);
@@ -244,15 +248,14 @@ class webBill extends baseScene
 
             // Kill Bill
             this.curBill[i].on('pointerdown', function() {
-                let tmpBill = this.curBill[i];
-                var deadBill = tmpBill.getAt(1);
+                let deadBillContainer = this.curBill[i];
+                var deadBill = deadBillContainer.getAt(1);
                 if (deadBill == undefined ) {
                     return;
                 }
-                tmpBill.setData("dead", "true");
-                tmpBill.body.stop();
+                deadBillContainer.setData("dead", "true");
+                deadBillContainer.body.stop();
                 // tmpBill.removeInteractive();
-                console.log(deadBill);
                 // Famous last words: we should only have two object
                 // in the container, Bill & payload
                 
@@ -260,22 +263,25 @@ class webBill extends baseScene
                 deadBill.once('animationcomplete', ()=>{ 
                     deadBill.setActive(false).setVisible(false);
 
-                    if (tmpBill.getAt(0).texture.key == "wingdows") {
-                        tmpBill.getAt(0).setActive(false).setVisible(false);
-                        tmpBill.removeInteractive();
+                    if (deadBillContainer.getAt(0).texture.key == "wingdows") {
+                        deadBillContainer.getAt(0).setActive(false).setVisible(false);
+                        deadBillContainer.removeInteractive();
                     } else {
                         // TODO this animate
                         // I hate js
-                        tmpBill.getAt(0).setX(deadBill.x).setY(deadBill.y);
-                        tmpBill.setInteractive();
-                        tmpBill.setDraggable(tmpBill);
+                        deadBillContainer.getAt(0).setX(deadBill.x).setY(deadBill.y);
+                        deadBillContainer.setInteractive();
+                        this.input.setDraggable(deadBillContainer);
                     }
                 });
+
+                this.aliveBills--;
             }.bind(this));
         } // End for (bill setup)
 
         this.offScreen = curMaxBills;
-        var timer = this.time.addEvent({
+        this.aliveBills = curMaxBills;
+        this.billTimer = this.time.addEvent({
             delay: 200,                // ms
             callback: this.timerCallback,
             args: [],
@@ -354,20 +360,22 @@ class webBill extends baseScene
             let launched = this.billLaunch(this.curLevel, this);
             console.log("Launched:" + launched);
             this.offScreen = this.offScreen - launched;
-        } else {
-            console.log("No more Bills left!")
         }
     }
 
     update()
     {
         super.update();
-        console.log(this.offScreen);
-        /*
-        if (offScreen > 0) {
-            score += (level * efficiency / iteration);
+        if (this.offScreen > 0) {
+            this.score += (this.curLevel * this.efficiency / this.iteration);
+        } else {
+            this.billTimer.remove();
         }
-        */
+
+        // XXX aliveBills do not reach 0 :(
+        if (this.aliveBills <= 0 ) {
+            console.log('Level done!');
+        }
     }
 
     billLaunch(level, t)
