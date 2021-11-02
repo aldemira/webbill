@@ -21,6 +21,7 @@ class gameMenu extends baseScene
     constructor()
     {
         super('gameMenu');
+        this.volImg = '';
     }
 
     preload()
@@ -36,6 +37,35 @@ class gameMenu extends baseScene
     create()
     {
         super.create();
+
+        let alpha = 0.5 + ((0 / 10) * 0.5);
+        let myIcon = '';
+        if (this.sound.mute) {
+            myIcon = "volume-mute";
+        } else {
+            myIcon = "volume-unmute";
+        }
+
+        this.volImg = this.add.image(36, 30, myIcon)
+            .setDisplaySize(36, 36)
+            .setInteractive()
+            .setDepth(2)
+            .on('pointerdown', this.muteSound, this);
+
+        let volIconBox = this.add.graphics();
+        volIconBox.fillStyle(0x787878, alpha)
+            .setDepth(1)
+            .fillRect(10,10, 48, 68)
+            .lineStyle(2, 0x000000, 0.5)
+            .strokeRect(10,58,48,20);
+
+        // Poor man's shadow
+        volIconBox.lineStyle(2, 0xffffff, 0.5)
+            .strokeRect(12, 60, 47, 17);
+
+        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
+        this.add.text(15,63, 'Volume', iconBoxStyle);
+
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
         // Need to pass this to functions and whatnot
@@ -196,6 +226,19 @@ it out.  We did, so it can't be too hard."
         //t.game.load.plugin('rexscaleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexscaleplugin.min.js', true);
         //scene.plugins.get('rexscaleplugin').popup(ruleText, 0);
     }
+
+    muteSound()
+    {
+        let myIcon = '';
+        game.sound.mute = !game.sound.mute;
+        if (game.sound.mute) {
+            myIcon = "volume-mute";
+        } else {
+            myIcon = "volume-unmute";
+        }
+        this.volImg.setTexture(myIcon);
+    }
+
 
     showAbout()
     {
