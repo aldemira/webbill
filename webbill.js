@@ -223,49 +223,38 @@ class webBill extends baseScene
                 .setData("ingame", "false")
                 .setData("dead", "false");
             this.physics.world.enable(this.curBill[i]);
+
+            // Kill Bill
             this.curBill[i].on('pointerdown', function() {
-                var deadBill = this.getAt(1);
+                let tmpBill = this.curBill[i];
+                var deadBill = tmpBill.getAt(1);
                 if (deadBill == undefined ) {
                     return;
                 }
-                this.setData("dead", "true");
-                this.body.stop();
-                this.removeInteractive();
+                tmpBill.setData("dead", "true");
+                tmpBill.body.stop();
+                // tmpBill.removeInteractive();
+                console.log(deadBill);
                 // Famous last words: we should only have two object
                 // in the container, Bill & payload
-                if (this.getAt(0).texture.key == "wingdows") {
-                    this.removeAt(0, true);
-                } else {
-                    let goodOS = this.removeAt(0, false);
-                    // TODO this animate
-                    goodOS.x = this.x;
-                    goodOS.y = this.y;
-                    goodOS.setInteractive();
-                    goodOS.setActive(true).setVisible(true);
-                }
-                console.log("aaa");
-
-                // Remove this container from available Bills
-                // TODO find a way to fetch the bill array
-                /*
-                const index = this.parent.indexOf(this);
-                if (index > -1) {
-                    this.parent.splice(index, 1);
-                }
-                */
-
+                
                 deadBill.play('billDAnim');
-               // var explosion = new billDies(this, deadBill.x, deadBill.y);
                 deadBill.once('animationcomplete', ()=>{ 
-                    console.log('animationcomplete')
                     deadBill.setActive(false).setVisible(false);
-                    deadBill.destroy();
-                });
 
-                this.destroy();
-            });
-            // this.curBill[i].self.on('pointerdown', this.onBillClick, this);
-        }
+                    if (tmpBill.getAt(0).texture.key == "wingdows") {
+                        tmpBill.getAt(0).setActive(false).setVisible(false);
+                        tmpBill.removeInteractive();
+                    } else {
+                        // TODO this animate
+                        // I hate js
+                        tmpBill.getAt(0).setX(deadBill.x).setY(deadBill.y);
+                        tmpBill.setInteractive();
+                        tmpBill.setDraggable(tmpBill);
+                    }
+                });
+            }.bind(this));
+        } // End for (bill setup)
 
         this.offScreen = curMaxBills;
         var timer = this.time.addEvent({

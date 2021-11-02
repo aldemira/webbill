@@ -38,7 +38,10 @@ class gameMenu extends baseScene
             .setPadding(10)
             .setDepth(1)
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {this.scene.stop('gameMenu'); this.scene.start('webBill');})
+            .on('pointerdown', () => {
+                this.scene.stop('gameMenu'); 
+                this.sound.removeAll();
+                this.scene.start('webBill');})
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
