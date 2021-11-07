@@ -46,25 +46,85 @@ class gameMenu extends baseScene
             myIcon = "volume-unmute";
         }
 
-        this.volImg = this.add.image(36, 30, myIcon)
-            .setDisplaySize(36, 36)
-            .setInteractive()
+
+        // Start Dock Graphics
+        let dockBox = this.add.graphics();
+        dockBox.fillStyle(0x787878, 1)
             .setDepth(2)
-            .on('pointerdown', this.muteSound, this);
+            .fillRect(6, 6, 105, 140);
+        // Left shadow
+        var myLine = new Phaser.Geom.Line(8, 7, 8, 146);
+        dockBox.lineStyle(1, 0xffffff, 0.5)
+            .strokeLineShape(myLine);
+        // top shadow
+        myLine = new Phaser.Geom.Line(7, 7, 111, 7);
+        dockBox.strokeLineShape(myLine);
+
+        // right Shadow
+        myLine = new Phaser.Geom.Line(111, 7, 111, 146);
+        dockBox.lineStyle(1, 0x333637, 1)
+            .strokeLineShape(myLine);
+
+        // bottom shadow
+        myLine = new Phaser.Geom.Line(7, 145, 111, 145);
+        dockBox.strokeLineShape(myLine);
 
         let volIconBox = this.add.graphics();
         volIconBox.fillStyle(0x787878, alpha)
-            .setDepth(1)
-            .fillRect(10,10, 48, 68)
-            .lineStyle(2, 0x000000, 0.5)
-            .strokeRect(10,58,48,20);
+            .setDepth(3)
+            .fillRect(10, 10, 48, 68)
+            .setInteractive()
+            .on('pointerdown', this.muteSound, this);
 
-        // Poor man's shadow
+        this.volImg = this.add.image(36, 30, myIcon)
+            .setDisplaySize(36, 36)
+            .setInteractive()
+            .setDepth(4)
+            .on('pointerdown', this.muteSound, this);
+
+        // Left & top white shadow
+        myLine = new Phaser.Geom.Line(10, 10, 10, 68);
         volIconBox.lineStyle(2, 0xffffff, 0.5)
-            .strokeRect(12, 60, 47, 17);
+            .strokeLineShape(myLine);
+        myLine = new Phaser.Geom.Line(10, 10, 56, 10);
+        volIconBox.strokeLineShape(myLine);
+
+        // Right and bottom black shadow
+        myLine = new Phaser.Geom.Line(10, 68, 58, 68);
+        volIconBox.lineStyle(2, 0x333637, 0.5)
+            .strokeLineShape(myLine);
+        myLine = new Phaser.Geom.Line(58, 10, 58, 68);
+        volIconBox.strokeLineShape(myLine);
 
         const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
-        this.add.text(15,63, 'Volume', iconBoxStyle);
+        this.add.text(15,55, 'Volume', iconBoxStyle).setDepth(4);
+
+        // TODO make rect widths variable
+        let rulesIconBox = this.add.graphics();
+        rulesIconBox.fillStyle(0x787878, alpha)
+            .setDepth(3)
+            .fillRect(58,10, 48, 68);
+        this.add.text(63,55, 'Rules', iconBoxStyle).setDepth(4);
+        // Left & top white shadow
+        myLine = new Phaser.Geom.Line(59, 10, 59, 68);
+        rulesIconBox.lineStyle(2, 0xffffff, 0.5)
+            .strokeLineShape(myLine);
+        myLine = new Phaser.Geom.Line(59, 10, 59+46, 10);
+        rulesIconBox.strokeLineShape(myLine);
+
+        // Right and bottom black shadow
+        myLine = new Phaser.Geom.Line(59+48, 10, 59+48, 68);
+        rulesIconBox.lineStyle(2, 0x333637, 0.5)
+            .strokeLineShape(myLine);
+        myLine = new Phaser.Geom.Line(59, 68, 59+48, 68);
+        rulesIconBox.strokeLineShape(myLine);
+
+        let aboutIconBox = this.add.graphics();
+        aboutIconBox.fillStyle(0x787878, alpha)
+            .setDepth(3)
+            .fillRect(10, 59+48, 10, 68);
+
+        // End dock icons
 
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
@@ -94,6 +154,7 @@ class gameMenu extends baseScene
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
 
+        /*
         let rulesButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 20, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0.5)
             .setPadding(10)
@@ -102,7 +163,6 @@ class gameMenu extends baseScene
             .on('pointerover', () => rulesButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => rulesButton.setStyle({ fill: '#4af626' }));
 
-        /*
         rulesButton.on('pointerdown', function() {
             let tempConsole = myContext.add.image(myWidth / 2, myHeight / 2 + 100, 'terminal').setDepth(3);
         });
@@ -158,7 +218,7 @@ class gameMenu extends baseScene
 
 
         this.typewriteText('Start Game', startButton);
-        this.typewriteText('Rules', rulesButton);
+        // this.typewriteText('Rules', rulesButton);
         this.typewriteText('About', aboutButton);
     }
 
