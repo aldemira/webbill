@@ -32,6 +32,8 @@ class gameMenu extends baseScene
         this.dockMainLineHeight = this.dockMainHeight - 1;
         this.shadowLineThickness = 1;
         this.shadowLineAlpha = 0.5;
+        this.shadowWhite = 0xffffff;
+        this.shadowGrey = 0x333637;
     }
 
     preload()
@@ -41,7 +43,9 @@ class gameMenu extends baseScene
         this.load.image("terminal", "images/terminal2.png");
         this.load.audio("hdd", "sounds/hdd_sound.ogg");
         this.load.audio("modem", "sounds/modem.ogg");
-        this.load.image('about', 'images/about.png');
+        this.load.image('xbillabout', 'images/xbill-about.png');
+        this.load.image('abouticon', 'images/about.svg');
+        this.load.image('rulesicon', 'images/rules.svg');
     }
 
     create()
@@ -49,11 +53,11 @@ class gameMenu extends baseScene
         super.create();
 
         let alpha = 0.5 + ((0 / 10) * 0.5);
-        let myIcon = '';
+        let myVolIcon = '';
         if (this.sound.mute) {
-            myIcon = "volume-mute";
+            myVolIcon = "volume-mute";
         } else {
-            myIcon = "volume-unmute";
+            myVolIcon = "volume-unmute";
         }
 
 
@@ -81,20 +85,33 @@ class gameMenu extends baseScene
             .setDepth(3)
             .fillRect(10, 11+this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
 
-        this.volImg = this.add.image(36, 30, myIcon)
+        this.volImg = this.add.image(38, 31, myVolIcon)
             .setDisplaySize(36, 36)
             .setInteractive()
             .setDepth(4)
             .on('pointerdown', this.muteSound, this);
 
-        this.add.text(15,55, 'Volume', iconBoxStyle).setDepth(4);
-        this.add.text(15 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
-        this.add.text(15,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
+        this.aboutIcon = this.add.image(35, 31 + this.dockBoxHeight, 'abouticon')
+            .setDisplaySize(36, 36)
+            .setInteractive()
+            .setDepth(4)
+            .on('pointerdown', this.showAbout, this);
 
-        // Main dock box shadows
+        this.rulesIcon = this.add.image(38 + this.dockBoxWidth, 31, 'rulesicon')
+            .setDisplaySize(36, 36)
+            .setInteractive()
+            .setDepth(4)
+            .on('pointerdown', this.showRules, this);
+
+
+        this.add.text(17,55, 'Volume', iconBoxStyle).setDepth(4);
+        this.add.text(17 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
+        this.add.text(17,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
+
+        // MAIN dock box shadows
         // Left shadow
         var myLine = new Phaser.Geom.Line(6, 6, 6, 6 + this.dockMainLineHeight);
-        dockBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+        dockBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // top shadow
         myLine = new Phaser.Geom.Line(6, 6, 6 + this.dockMainLineWidth, 6);
@@ -102,17 +119,17 @@ class gameMenu extends baseScene
 
         // right Shadow
         myLine = new Phaser.Geom.Line(6 + this.dockMainLineWidth, 6, 6 + this.dockMainLineWidth, 6 + this.dockMainLineHeight);
-        dockBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+        dockBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
             .strokeLineShape(myLine);
 
         // bottom shadow
         myLine = new Phaser.Geom.Line(5, 5 + this.dockMainLineHeight, 5 + this.dockMainLineWidth, 5 + this.dockMainLineHeight);
         dockBox.strokeLineShape(myLine);
 
-        // Volume box shadows
+        // VOLUME BOX SHADOWS
         // Left  white shadow
         myLine = new Phaser.Geom.Line(10, 10, 10, 10 + this.dockBoxHeight);
-        volIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+        volIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // Top shadow
         myLine = new Phaser.Geom.Line(10, 10, 10 + this.dockBoxWidth, 10);
@@ -120,7 +137,7 @@ class gameMenu extends baseScene
 
         // Bottom black shadow
         myLine = new Phaser.Geom.Line(10, 10 + this.dockBoxHeight, 10 + this.dockBoxWidth, 10 + this.dockBoxHeight);
-        volIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+        volIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // Right shadow
         myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 10, 10 + this.dockBoxWidth, 10 + this.dockBoxWidth);
@@ -129,7 +146,7 @@ class gameMenu extends baseScene
         // Rules box shadows
         // Left  white shadow
         myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + this.dockBoxWidth, 10 + this.dockBoxHeight);
-        rulesIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+        rulesIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // top white shadow
         myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + (this.dockBoxWidth * 2), 10);
@@ -137,16 +154,16 @@ class gameMenu extends baseScene
 
         // Right black shadow
         myLine = new Phaser.Geom.Line(11 + (this.dockBoxWidth * 2), 10, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
-        rulesIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+        rulesIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // bottom black shadow
         myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10 + this.dockBoxHeight, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
         rulesIconBox.strokeLineShape(myLine);
 
-        // About box shadows
+        // ABOUT BOX SHADOWS
         // Left  white shadow
         myLine = new Phaser.Geom.Line(10, 11 + this.dockBoxHeight, 10, 11 + (this.dockBoxHeight * 2));
-        aboutIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+        aboutIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // top white shadow
         myLine = new Phaser.Geom.Line(10, 11, 10 + this.dockBoxWidth, 11);
@@ -154,10 +171,10 @@ class gameMenu extends baseScene
 
         // Right black shadow
         myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 11 + this.dockBoxHeight, 10 + this.dockBoxWidth , 11 + (this.dockBoxHeight * 2));
-        aboutIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+        aboutIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
             .strokeLineShape(myLine);
         // bottom black shadow
-        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 11 + this.dockBoxHeight, 10 + (this.dockBoxWidth * 2 ), 11 + this.dockBoxHeight);
+        myLine = new Phaser.Geom.Line(10, 10 + (this.dockBoxHeight*2), 10 + this.dockBoxWidth, 10 + (this.dockBoxHeight*2));
         aboutIconBox.strokeLineShape(myLine);
 
         // End dock icons
@@ -255,8 +272,6 @@ class gameMenu extends baseScene
 
 
         this.typewriteText('Start Game', startButton);
-        // this.typewriteText('Rules', rulesButton);
-        // this.typewriteText('About', aboutButton);
     }
 
     update()
@@ -324,6 +339,10 @@ it out.  We did, so it can't be too hard."
         //scene.plugins.get('rexscaleplugin').popup(ruleText, 0);
     }
 
+    showAbout()
+    {
+    }
+
     muteSound()
     {
         let myIcon = '';
@@ -334,10 +353,5 @@ it out.  We did, so it can't be too hard."
             myIcon = "volume-unmute";
         }
         this.volImg.setTexture(myIcon);
-    }
-
-
-    showAbout()
-    {
     }
 }
