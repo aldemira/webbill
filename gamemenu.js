@@ -22,6 +22,16 @@ class gameMenu extends baseScene
     {
         super('gameMenu');
         this.volImg = '';
+        this.dockBoxHeight = 60;
+        this.dockBoxWidth = 50;
+        this.dockMainBoxWOffset = 8;
+        this.dockMainBoxHOffset = 20;
+        this.dockMainWidth =  (this.dockBoxWidth * 2) + this.dockMainBoxWOffset + 1;
+        this.dockMainHeight = (this.dockBoxHeight * 2) + this.dockMainBoxHOffset + 1;
+        this.dockMainLineWidth = this.dockMainWidth - 1;
+        this.dockMainLineHeight = this.dockMainHeight - 1;
+        this.shadowLineThickness = 1;
+        this.shadowLineAlpha = 0.5;
     }
 
     preload()
@@ -48,33 +58,28 @@ class gameMenu extends baseScene
 
 
         // Start Dock Graphics
+        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
+        // Main dock background
         let dockBox = this.add.graphics();
-        dockBox.fillStyle(0x787878, 1)
-            .setDepth(2)
-            .fillRect(6, 6, 105, 140);
-        // Left shadow
-        var myLine = new Phaser.Geom.Line(8, 7, 8, 146);
-        dockBox.lineStyle(1, 0xffffff, 0.5)
-            .strokeLineShape(myLine);
-        // top shadow
-        myLine = new Phaser.Geom.Line(7, 7, 111, 7);
-        dockBox.strokeLineShape(myLine);
-
-        // right Shadow
-        myLine = new Phaser.Geom.Line(111, 7, 111, 146);
-        dockBox.lineStyle(1, 0x333637, 1)
-            .strokeLineShape(myLine);
-
-        // bottom shadow
-        myLine = new Phaser.Geom.Line(7, 145, 111, 145);
-        dockBox.strokeLineShape(myLine);
+        dockBox.fillStyle(0x333637, alpha)
+            .fillRect(5, 5, this.dockMainWidth, this.dockMainHeight);
 
         let volIconBox = this.add.graphics();
         volIconBox.fillStyle(0x787878, alpha)
             .setDepth(3)
-            .fillRect(10, 10, 48, 68)
+            .fillRect(10, 10, this.dockBoxWidth , this.dockBoxHeight)
             .setInteractive()
             .on('pointerdown', this.muteSound, this);
+
+        let rulesIconBox = this.add.graphics();
+        rulesIconBox.fillStyle(0x787878, alpha)
+            .setDepth(3)
+            .fillRect(11 + this.dockBoxWidth, 10, this.dockBoxWidth, this.dockBoxHeight);
+
+        let aboutIconBox = this.add.graphics();
+        aboutIconBox.fillStyle(0x787878, alpha)
+            .setDepth(3)
+            .fillRect(10, 11+this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
 
         this.volImg = this.add.image(36, 30, myIcon)
             .setDisplaySize(36, 36)
@@ -82,50 +87,80 @@ class gameMenu extends baseScene
             .setDepth(4)
             .on('pointerdown', this.muteSound, this);
 
-        // Left & top white shadow
-        myLine = new Phaser.Geom.Line(10, 10, 10, 68);
-        volIconBox.lineStyle(2, 0xffffff, 0.5)
-            .strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(10, 10, 56, 10);
-        volIconBox.strokeLineShape(myLine);
-
-        // Right and bottom black shadow
-        myLine = new Phaser.Geom.Line(10, 68, 58, 68);
-        volIconBox.lineStyle(2, 0x333637, 0.5)
-            .strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(58, 10, 58, 68);
-        volIconBox.strokeLineShape(myLine);
-
-        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
         this.add.text(15,55, 'Volume', iconBoxStyle).setDepth(4);
+        this.add.text(15 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
+        this.add.text(15,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
 
-        // TODO make rect widths variable
-        let rulesIconBox = this.add.graphics();
-        rulesIconBox.fillStyle(0x787878, alpha)
-            .setDepth(3)
-            .fillRect(58,10, 48, 68);
-        this.add.text(63,55, 'Rules', iconBoxStyle).setDepth(4);
-        // Left & top white shadow
-        myLine = new Phaser.Geom.Line(59, 10, 59, 68);
-        rulesIconBox.lineStyle(2, 0xffffff, 0.5)
+        // Main dock box shadows
+        // Left shadow
+        var myLine = new Phaser.Geom.Line(6, 6, 6, 6 + this.dockMainLineHeight);
+        dockBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
             .strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(59, 10, 59+46, 10);
+        // top shadow
+        myLine = new Phaser.Geom.Line(6, 6, 6 + this.dockMainLineWidth, 6);
+        dockBox.strokeLineShape(myLine);
+
+        // right Shadow
+        myLine = new Phaser.Geom.Line(6 + this.dockMainLineWidth, 6, 6 + this.dockMainLineWidth, 6 + this.dockMainLineHeight);
+        dockBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+
+        // bottom shadow
+        myLine = new Phaser.Geom.Line(5, 5 + this.dockMainLineHeight, 5 + this.dockMainLineWidth, 5 + this.dockMainLineHeight);
+        dockBox.strokeLineShape(myLine);
+
+        // Volume box shadows
+        // Left  white shadow
+        myLine = new Phaser.Geom.Line(10, 10, 10, 10 + this.dockBoxHeight);
+        volIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // Top shadow
+        myLine = new Phaser.Geom.Line(10, 10, 10 + this.dockBoxWidth, 10);
+        volIconBox.strokeLineShape(myLine);
+
+        // Bottom black shadow
+        myLine = new Phaser.Geom.Line(10, 10 + this.dockBoxHeight, 10 + this.dockBoxWidth, 10 + this.dockBoxHeight);
+        volIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // Right shadow
+        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 10, 10 + this.dockBoxWidth, 10 + this.dockBoxWidth);
+        volIconBox.strokeLineShape(myLine);
+
+        // Rules box shadows
+        // Left  white shadow
+        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + this.dockBoxWidth, 10 + this.dockBoxHeight);
+        rulesIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // top white shadow
+        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + (this.dockBoxWidth * 2), 10);
         rulesIconBox.strokeLineShape(myLine);
 
-        // Right and bottom black shadow
-        myLine = new Phaser.Geom.Line(59+48, 10, 59+48, 68);
-        rulesIconBox.lineStyle(2, 0x333637, 0.5)
+        // Right black shadow
+        myLine = new Phaser.Geom.Line(11 + (this.dockBoxWidth * 2), 10, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
+        rulesIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
             .strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(59, 68, 59+48, 68);
+        // bottom black shadow
+        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10 + this.dockBoxHeight, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
         rulesIconBox.strokeLineShape(myLine);
 
-        let aboutIconBox = this.add.graphics();
-        aboutIconBox.fillStyle(0x787878, alpha)
-            .setDepth(3)
-            .fillRect(10, 59+48, 10, 68);
+        // About box shadows
+        // Left  white shadow
+        myLine = new Phaser.Geom.Line(10, 11 + this.dockBoxHeight, 10, 11 + (this.dockBoxHeight * 2));
+        aboutIconBox.lineStyle(this.shadowLineThickness, 0xffffff, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // top white shadow
+        myLine = new Phaser.Geom.Line(10, 11, 10 + this.dockBoxWidth, 11);
+        aboutIconBox.strokeLineShape(myLine);
+
+        // Right black shadow
+        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 11 + this.dockBoxHeight, 10 + this.dockBoxWidth , 11 + (this.dockBoxHeight * 2));
+        aboutIconBox.lineStyle(this.shadowLineThickness, 0x333637, this.shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // bottom black shadow
+        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 11 + this.dockBoxHeight, 10 + (this.dockBoxWidth * 2 ), 11 + this.dockBoxHeight);
+        aboutIconBox.strokeLineShape(myLine);
 
         // End dock icons
-
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
         // Need to pass this to functions and whatnot
@@ -166,7 +201,6 @@ class gameMenu extends baseScene
         rulesButton.on('pointerdown', function() {
             let tempConsole = myContext.add.image(myWidth / 2, myHeight / 2 + 100, 'terminal').setDepth(3);
         });
-        */
 
         let aboutButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 90, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0.5)
@@ -175,6 +209,7 @@ class gameMenu extends baseScene
             .setInteractive({ useHandCursor: true})
             .on('pointerover', () => aboutButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => aboutButton.setStyle({ fill: '#4af626' }));
+        */
 
         let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
             .setOrigin(0.5)
@@ -196,6 +231,7 @@ class gameMenu extends baseScene
             aboutButton.setVisible(true);
         });
 
+        /*
         aboutButton.on('pointerdown', function() {
             aboutimg.setVisible(true);
             okButton.setVisible(true);
@@ -203,6 +239,7 @@ class gameMenu extends baseScene
             rulesButton.setVisible(false);
             aboutButton.setVisible(false);
         });
+        */
 
         this.sound.play('hdd',{
             loop: true
@@ -219,7 +256,7 @@ class gameMenu extends baseScene
 
         this.typewriteText('Start Game', startButton);
         // this.typewriteText('Rules', rulesButton);
-        this.typewriteText('About', aboutButton);
+        // this.typewriteText('About', aboutButton);
     }
 
     update()
