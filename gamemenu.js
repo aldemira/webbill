@@ -22,6 +22,9 @@ class gameMenu extends baseScene
     {
         super('gameMenu');
         this.volImg = '';
+        this.terminalContainer = '';
+        this.menuWindowContextX = this.game.renderer.width / 2;
+        this.menuWindowContextY = (this.game.renderer.height / 2) + 50;
         this.dockBoxHeight = 60;
         this.dockBoxWidth = 50;
         this.dockMainBoxWOffset = 8;
@@ -34,6 +37,12 @@ class gameMenu extends baseScene
         this.shadowLineAlpha = 0.5;
         this.shadowWhite = 0xffffff;
         this.shadowGrey = 0x333637;
+
+        this.aboutContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
+        this.aboutContainer.setVisible(false);
+
+        this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
+        this.rulesContainer.setVisible(false);
     }
 
     preload()
@@ -46,6 +55,7 @@ class gameMenu extends baseScene
         this.load.image('xbillabout', 'images/xbill-about.png');
         this.load.image('abouticon', 'images/about.svg');
         this.load.image('rulesicon', 'images/rules.svg');
+        // this.load.image('xwindowbox','images/xwindow.png');
     }
 
     create()
@@ -190,10 +200,11 @@ class gameMenu extends baseScene
         let win2 = this.add.image(0, -20, 'wingdows');
         let container1 = this.add.container((myWidth / 2 ) - 200, myHeight * 0.2, [win1, bill1]);
         let container2 = this.add.container((myWidth / 2 ) + 200, myHeight * 0.2, [win2, bill2]);
-        this.add.image(myWidth / 2, myHeight / 2 + 50, 'terminal').setDepth(0);
+
+        let menuTerminal = this.add.image(0, 0, 'terminal').setDepth(0);
 
         const textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", fixedWidth: 370, backgroundColor: '#fff' };
-        let startButton = this.add.text((myWidth / 2) - 40 , (myHeight / 2) - 50, 'bash-3.14 ~# ', textStyle)
+        let startButton = this.add.text(-40 , -100, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0.5)
             .setPadding(10)
             .setDepth(1)
@@ -205,6 +216,7 @@ class gameMenu extends baseScene
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
+        this.terminalContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY, [menuTerminal, startButton]);
 
         /*
         let rulesButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 20, 'bash-3.14 ~# ', textStyle)
@@ -313,6 +325,7 @@ class gameMenu extends baseScene
 
     showRules()
     {
+        this.terminalContainer.setVisible(!this.terminalContainer.visible);
         let ruleText = `
         xBill has been painstakingly designed and\n
 researched in order to make it as easy to use\n
@@ -334,13 +347,11 @@ As for the rest, you can probably figure\n
 it out.  We did, so it can't be too hard."
         `;
 
-        console.log(this);
-        //t.game.load.plugin('rexscaleplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexscaleplugin.min.js', true);
-        //scene.plugins.get('rexscaleplugin').popup(ruleText, 0);
     }
 
     showAbout()
     {
+        this.terminalContainer.setVisible(!this.terminalContainer.visible);
     }
 
     muteSound()
