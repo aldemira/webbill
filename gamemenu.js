@@ -218,28 +218,6 @@ class gameMenu extends baseScene
 
         this.terminalContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY, [menuTerminal, startButton]);
 
-        /*
-        let rulesButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 20, 'bash-3.14 ~# ', textStyle)
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setDepth(1)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => rulesButton.setStyle({ fill: '#f39c12' }))
-            .on('pointerout', () => rulesButton.setStyle({ fill: '#4af626' }));
-
-        rulesButton.on('pointerdown', function() {
-            let tempConsole = myContext.add.image(myWidth / 2, myHeight / 2 + 100, 'terminal').setDepth(3);
-        });
-
-        let aboutButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 90, 'bash-3.14 ~# ', textStyle)
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setDepth(1)
-            .setInteractive({ useHandCursor: true})
-            .on('pointerover', () => aboutButton.setStyle({ fill: '#f39c12' }))
-            .on('pointerout', () => aboutButton.setStyle({ fill: '#4af626' }));
-        */
-
         let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
             .setOrigin(0.5)
             .setPadding(10)
@@ -259,16 +237,6 @@ class gameMenu extends baseScene
             rulesButton.setVisible(true);
             aboutButton.setVisible(true);
         });
-
-        /*
-        aboutButton.on('pointerdown', function() {
-            aboutimg.setVisible(true);
-            okButton.setVisible(true);
-            startButton.setVisible(false);
-            rulesButton.setVisible(false);
-            aboutButton.setVisible(false);
-        });
-        */
 
         this.sound.play('hdd',{
             loop: true
