@@ -23,8 +23,12 @@ class gameMenu extends baseScene
         super('gameMenu');
         this.volImg = '';
         this.terminalContainer = '';
-        this.menuWindowContextX = this.game.renderer.width / 2;
-        this.menuWindowContextY = (this.game.renderer.height / 2) + 50;
+        this.aboutContainer = '';
+        this.rulesContainer = '';
+        // this.menuWindowContextX = this.game.renderer.width / 2;
+        this.menuWindowContextX = 600 / 2;
+        //this.menuWindowContextY = (this.game.renderer.height / 2) + 50;
+        this.menuWindowContextY = (800 / 2) + 50;
         this.dockBoxHeight = 60;
         this.dockBoxWidth = 50;
         this.dockMainBoxWOffset = 8;
@@ -38,11 +42,6 @@ class gameMenu extends baseScene
         this.shadowWhite = 0xffffff;
         this.shadowGrey = 0x333637;
 
-        this.aboutContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
-        this.aboutContainer.setVisible(false);
-
-        this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
-        this.rulesContainer.setVisible(false);
     }
 
     preload()
@@ -56,6 +55,7 @@ class gameMenu extends baseScene
         this.load.image('abouticon', 'images/about.svg');
         this.load.image('rulesicon', 'images/rules.svg');
         // this.load.image('xwindowbox','images/xwindow.png');
+
     }
 
     create()
@@ -69,6 +69,15 @@ class gameMenu extends baseScene
         } else {
             myVolIcon = "volume-unmute";
         }
+
+        // Generate About and Rules windows here
+        // TODO use pymotif to create real windows 
+        // and get screenshots from it.
+        this.aboutContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
+        this.aboutContainer.setVisible(false);
+
+        this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
+        this.rulesContainer.setVisible(false);
 
 
         // Start Dock Graphics
@@ -294,6 +303,7 @@ class gameMenu extends baseScene
     showRules()
     {
         this.terminalContainer.setVisible(!this.terminalContainer.visible);
+        this.rulesContainer.setVisible(!this.rulesContainer.visible);
         let ruleText = `
         xBill has been painstakingly designed and\n
 researched in order to make it as easy to use\n
@@ -320,6 +330,7 @@ it out.  We did, so it can't be too hard."
     showAbout()
     {
         this.terminalContainer.setVisible(!this.terminalContainer.visible);
+        this.aboutContainer.setVisible(!this.aboutContainer.visible);
     }
 
     muteSound()
