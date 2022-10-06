@@ -40,11 +40,13 @@ class webBill extends baseScene
         this.timeString = ':';
         this.timeText = '';
         this.volImg = '';
-        this.offScreen = 0;
+        // this.offScreen = 0;
         this.billTimer = '';
         this.efficiency = 1;
         this.iteration = 1;
         this.aliveBills = 0;
+        this.scoreText = '';
+        this.offScreenBillList = [];
     }
 
     preload()
@@ -211,6 +213,8 @@ class webBill extends baseScene
         // Original game tries to scale number of bills according to the game board dimensions
         let curMaxBills = Math.min((8 + 3 * this.curLevel) , this.MAXBILLS);
         for(let i = 0 ; i < curMaxBills; i++) {
+            // Maintain the index of off screen Bills
+            this.offScreenBillList.push(i);
             // 0 add bill just behind the x axis
             // 1 add bill just behind the y axis
             let xory = Phaser.Math.Between(0,1);
@@ -279,7 +283,7 @@ class webBill extends baseScene
             }.bind(this));
         } // End for (bill setup)
 
-        this.offScreen = curMaxBills;
+        // this.offScreen = curMaxBills;
         this.aliveBills = curMaxBills;
         this.billTimer = this.time.addEvent({
             delay: 200,                // ms
@@ -299,8 +303,8 @@ class webBill extends baseScene
         bottomBar.add(outerRect);
 
         // Scoreboard
-        let scoreText = this.add.text(60,-20, 'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score, menuStyle);
-        bottomBar.add(scoreText);
+        this.scoreText = this.add.text(60,-20, 'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score, menuStyle);
+        bottomBar.add(this.scoreText);
         let menuText = this.add.image(25, -20, "xlogo").setDisplaySize(25,20).setDepth(1);
         bottomBar.add(menuText);
         bottomBarGraph.lineStyle(2, 0x000000, 1);
@@ -356,25 +360,27 @@ class webBill extends baseScene
     }
 
     timerCallback() {
-        if (this.offScreen > 0) {
+        if (this.offScreenBillList.length > 0) {
             let launched = this.billLaunch(this.curLevel, this);
             console.log("Launched:" + launched);
-            this.offScreen = this.offScreen - launched;
         }
     }
 
     update()
     {
-        super.update();
-        if (this.offScreen > 0) {
+        // super.update();
+        if (this.offScreenBillList.length > 0) {
             this.score += (this.curLevel * this.efficiency / this.iteration);
         } else {
             this.billTimer.remove();
         }
+        console.log("Alive bills:" + this.aliveBills + " Offscreen: " + this.offScreenBillList.length);
+        this.scoreText.text =  'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score.toString();
 
-        // XXX aliveBills do not reach 0 :(
         if (this.aliveBills <= 0 ) {
             console.log('Level done!');
+            this.scene.pause();
+            this.showLevelDone(this.curLevel, this.scene);
         }
     }
 
@@ -382,18 +388,20 @@ class webBill extends baseScene
     {
         // Original xbill 2.1 formula
         var minBill = Math.min(2 + level / 4, 12);
-        var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreen));
+        var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreenBillList.length));
         console.log("Should release" + n + "Bills");
         let retVal = n;
         for (;n>0;n--) {
-            var myBill = Phaser.Utils.Array.GetRandom(this.curBill);
-            // console.log(myBill.getData("ingame"));
-            if (myBill == null || myBill.getData("ingame") == true || myBill.getData("dead") == true) {
+            let myBillIndex = Phaser.Utils.Array.GetRandom(this.offScreenBillList);
+            const tmpIndex = this.offScreenBillList.indexOf(myBillIndex);
+            if (tmpIndex > -1) {
+                this.offScreenBillList.splice(tmpIndex, 1);
+            } else {
                 continue;
             }
+            let myBill = this.curBill[myBillIndex];
             myBill.setData("ingame", "true");
             var myCPU = Phaser.Utils.Array.GetRandom(this.levelCompArr);
-            // console.log(myBill);
             t.physics.moveToObject(myBill, myCPU, 20);
             t.physics.add.overlap(myBill, myCPU, t.replaceOS, null, t);
         }
@@ -472,6 +480,13 @@ class webBill extends baseScene
             myIcon = "volume-unmute";
         }
         this.volImg.setTexture(myIcon);
+    }
+
+    showLevelDone(level, scene)
+    {
+        level++;
+        // Included from ui.js
+        const mybutton = this.createButton(0, 0, 'Next Level', scene, () => scene.restart());
     }
 
     hordeSetup(t, curLevel)
