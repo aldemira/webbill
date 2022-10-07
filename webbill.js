@@ -1,6 +1,6 @@
 /*
  WebBill
-Copyright (C) 2021  Aldemir Akpinar <aldemir.akpinar@gmail.com>
+Copyright (C) 2022  Aldemir Akpinar <aldemir.akpinar@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -368,7 +368,7 @@ class webBill extends baseScene
 
     timerCallback() {
         if (this.offScreenBillList.length > 0) {
-            let launched = this.billLaunch(this.curLevel, this);
+            let launched = this.billLaunch();
             console.log("Launched:" + launched);
         }
     }
@@ -391,11 +391,11 @@ class webBill extends baseScene
         }
     }
 
-    billLaunch(level, t)
+    billLaunch()
     {
         // XXX Try with this instead of t
         // Original xbill 2.1 formula
-        var minBill = Math.min(2 + level / 4, 12);
+        var minBill = Math.min(2 + this.curLevel / 4, 12);
         var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreenBillList.length));
         console.log("Should release" + n + "Bills");
         let retVal = n;
@@ -410,8 +410,8 @@ class webBill extends baseScene
             let myBill = this.curBill[myBillIndex];
             myBill.setData("ingame", "true");
             var myCPU = Phaser.Utils.Array.GetRandom(this.levelCompArr);
-            t.physics.moveToObject(myBill, myCPU, 20);
-            t.physics.add.overlap(myBill, myCPU, t.replaceOS, null, t);
+            this.physics.moveToObject(myBill, myCPU, 20);
+            this.physics.add.overlap(myBill, myCPU, t.replaceOS, null, t);
         }
 
         return retVal;
@@ -498,6 +498,20 @@ class webBill extends baseScene
     showLevelDone()
     {
         const mybutton = this.createButton(50, 50, 'Next Level', () => this.scene.restart({level: this.curLevel+1}));
+    }
+
+    createSpark()
+    {
+      // #define SPARK_SPEED 4
+      // #define SPARK_DELAY(level) (MAX(20 - (level), 0))
+      /*
+       * Remove timer (SPARK_DELAY)
+       * Set collision with the destionation
+       * Run animation
+       * Move it towards the cable
+       * If not put out kill dest os
+       */
+      // wingdows.play('flame');
     }
 
     hordeSetup(t, curLevel)

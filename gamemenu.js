@@ -1,6 +1,6 @@
 /*
  WebBill
-Copyright (C) 2021  Aldemir Akpinar <aldemir.akpinar@gmail.com>
+Copyright (C) 2022  Aldemir Akpinar <aldemir.akpinar@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class gameMenu extends baseScene
         }
 
         // Generate About and Rules windows here
-        // TODO use pymotif to create real windows 
+        // TODO use pygtk to create real windows 
         // and get screenshots from it.
         this.aboutContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
         this.aboutContainer.setVisible(false);
