@@ -379,13 +379,14 @@ class webBill extends baseScene
 
         if (this.aliveBills <= 0 ) {
             console.log('Level done!');
-            this.scene.pause();
-            this.showLevelDone(this.curLevel, this.scene);
+            // this.scene.pause();
+            this.showLevelDone();
         }
     }
 
     billLaunch(level, t)
     {
+        // XXX Try with this instead of t
         // Original xbill 2.1 formula
         var minBill = Math.min(2 + level / 4, 12);
         var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreenBillList.length));
@@ -422,6 +423,11 @@ class webBill extends baseScene
             var goodOS = myCPU.getAt(1);
 
             if (goodOS == undefined || goodOS.texture.key == "wingdows") {
+                // Choose a random cpu and work on it.
+                // XXX turn this code into a function
+                var myCPU = Phaser.Utils.Array.GetRandom(this.levelCompArr);
+                this.physics.moveToObject(myBill, myCPU, 20);
+                this.physics.add.overlap(myBill, myCPU, this.replaceOS, null, this);
                 return;
                //this.physics.moveTo(myBill, 100, 100);
             }
@@ -482,11 +488,10 @@ class webBill extends baseScene
         this.volImg.setTexture(myIcon);
     }
 
-    showLevelDone(level, scene)
+    showLevelDone()
     {
-        level++;
-        // Included from ui.js
-        const mybutton = this.createButton(0, 0, 'Next Level', scene, () => scene.restart());
+        this.curLevel++;
+        const mybutton = this.createButton(50, 50, 'Next Level', () => this.scene.restart());
     }
 
     hordeSetup(t, curLevel)
