@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class webBill extends baseScene
 {
+    curLevel;
+
     constructor()
     {
         super('webBill');
@@ -25,7 +27,6 @@ class webBill extends baseScene
         this.maxComputers = 20;
         this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
         this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
-        this.curLevel = 1;
         this.MINPC = 6;
         this.OSOFFSETX = -9;
         this.OSOFFSETY = -7;
@@ -47,6 +48,12 @@ class webBill extends baseScene
         this.aliveBills = 0;
         this.scoreText = '';
         this.offScreenBillList = [];
+    }
+
+    init(props)
+    {
+        const { level = 1 } = props;
+        this.curLevel = level
     }
 
     preload()
@@ -490,8 +497,7 @@ class webBill extends baseScene
 
     showLevelDone()
     {
-        this.curLevel++;
-        const mybutton = this.createButton(50, 50, 'Next Level', () => this.scene.restart());
+        const mybutton = this.createButton(50, 50, 'Next Level', () => this.scene.restart({level: this.curLevel+1}));
     }
 
     hordeSetup(t, curLevel)
