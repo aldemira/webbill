@@ -25,10 +25,8 @@ class gameMenu extends baseScene
         this.terminalContainer = '';
         this.aboutContainer = '';
         this.rulesContainer = '';
-        // this.menuWindowContextX = this.game.renderer.width / 2;
-        this.menuWindowContextX = 600 / 2;
-        //this.menuWindowContextY = (this.game.renderer.height / 2) + 50;
-        this.menuWindowContextY = (800 / 2) + 50;
+        this.menuWindowContextX = 0;
+        this.menuWindowContextY = 0;
         this.dockBoxHeight = 60;
         this.dockBoxWidth = 50;
         this.dockMainBoxWOffset = 8;
@@ -41,12 +39,13 @@ class gameMenu extends baseScene
         this.shadowLineAlpha = 0.5;
         this.shadowWhite = 0xffffff;
         this.shadowGrey = 0x333637;
-
     }
 
     preload()
     {
         super.preload();
+        this.menuWindowContextX = this.cameras.main.centerX;
+        this.menuWindowContextY = this.cameras.main.centerY + 50;
         this.load.image("logo", "images/newlogo.png");
         this.load.image("terminal", "images/terminal2.png");
         this.load.audio("hdd", "sounds/hdd_sound.ogg");

@@ -393,7 +393,6 @@ class webBill extends baseScene
 
     billLaunch()
     {
-        // XXX Try with this instead of t
         // Original xbill 2.1 formula
         var minBill = Math.min(2 + this.curLevel / 4, 12);
         var n = Phaser.Math.Between(1, Math.min(minBill, this.offScreenBillList.length));
@@ -411,7 +410,7 @@ class webBill extends baseScene
             myBill.setData("ingame", "true");
             var myCPU = Phaser.Utils.Array.GetRandom(this.levelCompArr);
             this.physics.moveToObject(myBill, myCPU, 20);
-            this.physics.add.overlap(myBill, myCPU, t.replaceOS, null, t);
+            this.physics.add.overlap(myBill, myCPU, this.replaceOS, null, this);
         }
 
         return retVal;
