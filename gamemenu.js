@@ -22,25 +22,6 @@ class gameMenu extends baseScene
     {
         super('gameMenu');
         this.volImg = '';
-        this.terminalContainer = '';
-        this.aboutContainer = '';
-        this.rulesContainer = '';
-        this.vimContainer = '';
-        this.menuWindowContextX = 0;
-        this.menuWindowContextY = 0;
-        this.dockBoxHeight = 60;
-        this.dockBoxWidth = 50;
-        this.dockMainBoxWOffset = 8;
-        this.dockMainBoxHOffset = 20;
-        this.dockMainWidth =  (this.dockBoxWidth * 2) + this.dockMainBoxWOffset + 1;
-        this.dockMainHeight = (this.dockBoxHeight * 2) + this.dockMainBoxHOffset + 1;
-        this.dockMainLineWidth = this.dockMainWidth - 1;
-        this.dockMainLineHeight = this.dockMainHeight - 1;
-        this.shadowLineThickness = 1;
-        this.shadowLineAlpha = 0.5;
-        this.shadowWhite = 0xffffff;
-        this.shadowGrey = 0x333637;
-        this.dockColour = 0x787878;
     }
 
     preload()
@@ -63,8 +44,9 @@ class gameMenu extends baseScene
     create()
     {
         super.create();
+        var div = document.getElementById('gameContainer');
+        div.style.backgroundColor = "#505075"; // Window maker Default Style
 
-        let alpha = 0.5 + ((0 / 10) * 0.5);
         let myVolIcon = '';
         if (this.sound.mute) {
             myVolIcon = "volume-mute";
@@ -81,139 +63,15 @@ class gameMenu extends baseScene
         this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
         this.rulesContainer.setVisible(false);
 
+        const docks = [{text: 'Volume', icon: myVolIcon}, 
+            {text: 'Rules', icon: 'rulesicon'},
+            {text: 'About', icon: 'abouticon'},
+            {text: 'Vim', icon: 'vimicon'}];
 
-        // Start Dock Graphics
-        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
-        // Main dock background
-        let dockBox = this.add.graphics();
-        dockBox.fillStyle(0x333637, alpha)
-            .fillRect(5, 5, this.dockMainWidth, this.dockMainHeight);
+        for (let i=0;i<docks.length;i++) {
+            this.createDockButton(i, 0, docks[i]['icon'], docks[i]['text'], this);
+        }
 
-        let volIconBox = this.add.graphics();
-        volIconBox.fillStyle(this.dockColour, alpha)
-            .setDepth(3)
-            .fillRect(10, 10, this.dockBoxWidth , this.dockBoxHeight)
-            .setInteractive()
-            .on('pointerdown', this.muteSound, this);
-
-        let rulesIconBox = this.add.graphics();
-        rulesIconBox.fillStyle(this.dockColour, alpha)
-            .setDepth(3)
-            .fillRect(11 + this.dockBoxWidth, 10, this.dockBoxWidth, this.dockBoxHeight);
-
-        let aboutIconBox = this.add.graphics();
-        aboutIconBox.fillStyle(this.dockColour, alpha)
-            .setDepth(3)
-            .fillRect(10, 11+this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
-
-        let vimDock = this.add.graphics();
-        vimDock.fillStyle(this.dockColour, alpha)
-            .setDepth(3)
-            .fillRect(11 + this.dockBoxWidth, 11 + this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
-
-        this.volImg = this.add.image(38, 31, myVolIcon)
-            .setDisplaySize(36, 36)
-            .setInteractive()
-            .setDepth(4)
-            .on('pointerdown', this.muteSound, this);
-
-        this.aboutIcon = this.add.image(35, 31 + this.dockBoxHeight, 'abouticon')
-            .setDisplaySize(36, 36)
-            .setInteractive()
-            .setDepth(4)
-            .on('pointerdown', this.showAbout, this);
-
-        this.rulesIcon = this.add.image(38 + this.dockBoxWidth, 31, 'rulesicon')
-            .setDisplaySize(36, 36)
-            .setInteractive()
-            .setDepth(4)
-            .on('pointerdown', this.showRules, this);
-
-        // New style buttons. Much better when the whole dock is clickable
-        let vimContainer = this.add.container(38 + this.dockBoxWidth, this.dockBoxHeight + 31)
-            .setSize(this.dockBoxWidth, this.dockBoxHeight)
-            .setDepth(4)
-            .setInteractive()
-            .on('pointerdown', this.showPoweredByVim, this);
-        vimContainer.add(this.add.sprite(0, 0, 'vimicon').setDisplaySize(36,36));
-        vimContainer.add(this.add.text(0, 25, 'Vim', iconBoxStyle).setDepth(4));
-        this.physics.world.enable(vimContainer);
-
-
-        this.add.text(17,55, 'Volume', iconBoxStyle).setDepth(4);
-        this.add.text(17 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
-        this.add.text(17,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
-
-        // MAIN dock box shadows
-        // Left shadow
-        var myLine = new Phaser.Geom.Line(6, 6, 6, 6 + this.dockMainLineHeight);
-        dockBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // top shadow
-        myLine = new Phaser.Geom.Line(6, 6, 6 + this.dockMainLineWidth, 6);
-        dockBox.strokeLineShape(myLine);
-
-        // right Shadow
-        myLine = new Phaser.Geom.Line(6 + this.dockMainLineWidth, 6, 6 + this.dockMainLineWidth, 6 + this.dockMainLineHeight);
-        dockBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-
-        // bottom shadow
-        myLine = new Phaser.Geom.Line(5, 5 + this.dockMainLineHeight, 5 + this.dockMainLineWidth, 5 + this.dockMainLineHeight);
-        dockBox.strokeLineShape(myLine);
-
-        // VOLUME BOX SHADOWS
-        // Left  white shadow
-        myLine = new Phaser.Geom.Line(10, 10, 10, 10 + this.dockBoxHeight);
-        volIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // Top shadow
-        myLine = new Phaser.Geom.Line(10, 10, 10 + this.dockBoxWidth, 10);
-        volIconBox.strokeLineShape(myLine);
-
-        // Bottom black shadow
-        myLine = new Phaser.Geom.Line(10, 10 + this.dockBoxHeight, 10 + this.dockBoxWidth, 10 + this.dockBoxHeight);
-        volIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // Right shadow
-        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 10, 10 + this.dockBoxWidth, 10 + this.dockBoxWidth);
-        volIconBox.strokeLineShape(myLine);
-
-        // Rules box shadows
-        // Left  white shadow
-        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + this.dockBoxWidth, 10 + this.dockBoxHeight);
-        rulesIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // top white shadow
-        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10, 11 + (this.dockBoxWidth * 2), 10);
-        rulesIconBox.strokeLineShape(myLine);
-
-        // Right black shadow
-        myLine = new Phaser.Geom.Line(11 + (this.dockBoxWidth * 2), 10, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
-        rulesIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // bottom black shadow
-        myLine = new Phaser.Geom.Line(11 + this.dockBoxWidth, 10 + this.dockBoxHeight, 11 + (this.dockBoxWidth * 2) , 10 + this.dockBoxHeight);
-        rulesIconBox.strokeLineShape(myLine);
-
-        // ABOUT BOX SHADOWS
-        // Left  white shadow
-        myLine = new Phaser.Geom.Line(10, 11 + this.dockBoxHeight, 10, 11 + (this.dockBoxHeight * 2));
-        aboutIconBox.lineStyle(this.shadowLineThickness, this.shadowWhite, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // top white shadow
-        myLine = new Phaser.Geom.Line(10, 11, 10 + this.dockBoxWidth, 11);
-        aboutIconBox.strokeLineShape(myLine);
-
-        // Right black shadow
-        myLine = new Phaser.Geom.Line(10 + this.dockBoxWidth, 11 + this.dockBoxHeight, 10 + this.dockBoxWidth , 11 + (this.dockBoxHeight * 2));
-        aboutIconBox.lineStyle(this.shadowLineThickness, this.shadowGrey, this.shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // bottom black shadow
-        myLine = new Phaser.Geom.Line(10, 10 + (this.dockBoxHeight*2), 10 + this.dockBoxWidth, 10 + (this.dockBoxHeight*2));
-        aboutIconBox.strokeLineShape(myLine);
-
-        // End dock icons
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
         // Need to pass this to functions and whatnot
@@ -300,6 +158,29 @@ class gameMenu extends baseScene
         })
     }
 
+    dockCalls(dock)
+    {
+        console.log(dock);
+        dockType = dock.data.get('type');
+        console.log(dockType);
+        switch(dockType) {
+            case 'Vim':
+                this.showPoweredByVim();
+                break;
+            case 'Rules':
+                this.showRules();
+                break;
+            case 'Volume':
+                this.muteSound();
+                break;
+            case 'About':
+                this.showAbout();
+                break;
+            default:
+                return;
+        }
+    }
+
     blinkCursor(obj)
     {
 
@@ -362,8 +243,85 @@ it out.  We did, so it can't be too hard."
         this.volImg.setTexture(myIcon);
     }
 
+/*
+ * vrow => int, vertical row
+ * hrow => int, horizontal row
+ * icon => string, previously loaded image 
+ * dockText => string, docker text to place under icon
+ * callback => function, function to call on click
+ */
+    createDockButton(vrow, hrow, icon, dockText)
+    {
+        let dockBoxHeight = 64;
+        let dockBoxWidth = 64;
+        let shadowLineThickness = 3;
+        let dockMainLineWidth = dockBoxWidth - shadowLineThickness;
+        let dockMainLineHeight = dockBoxHeight - shadowLineThickness;
+        let shadowLineAlpha = 0.5;
+        let dockColour1 = 0xa6a6b6;
+        let dockColour2 = 0x515561;
+        let shadowWhite = 0xffffff;
+        let shadowGrey = 0x333637;
+
+        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
+        let alpha = 0.5 + ((0 / 10) * 0.5);
+        // For simplicity let's have single line of column regardless
+        hrow = 0;
+        //let myContainer = this.add.container(1, 1)
+        let myContainer = this.add.container((dockBoxWidth * hrow), dockBoxHeight * vrow)
+            .setDataEnabled()
+            .setSize(dockBoxWidth, dockBoxHeight)
+            .setDepth(4);
+
+        let myDockBox = this.add.graphics()
+             .setDepth(1);
+        myDockBox.fillGradientStyle(dockColour1, dockColour2, dockColour2, dockColour2, 1);
+        myDockBox.fillRect(0, 0, dockBoxWidth, dockBoxHeight);
+        myContainer.add(myDockBox);
+
+        // dock box shadows
+        // Left shadow
+        var myLine = new Phaser.Geom.Line(0, 0, 0, 0 + dockMainLineHeight);
+        myDockBox.lineStyle(shadowLineThickness, shadowWhite, shadowLineAlpha)
+            .strokeLineShape(myLine);
+        // top shadow
+        myLine = new Phaser.Geom.Line(1, 0, dockMainLineWidth, 0);
+        myDockBox.strokeLineShape(myLine);
+
+        // right Shadow
+        myLine = new Phaser.Geom.Line(dockMainLineWidth - 1, 0, 0 + dockMainLineWidth, 0 + dockMainLineHeight);
+        myDockBox.lineStyle(shadowLineThickness, shadowGrey, shadowLineAlpha)
+        .strokeLineShape(myLine);
+
+        // bottom shadow
+        myLine = new Phaser.Geom.Line(0, 0 + dockMainLineHeight, 0 + dockMainLineWidth, 0 + dockMainLineHeight);
+        myDockBox.strokeLineShape(myLine);
+
+        console.log('Adding: ' + dockText);
+
+        let iconX = dockBoxWidth - 8;
+        let iconY = dockBoxHeight - 8;
+        let myIcon = this.add.image(iconX / 2, iconY /2, icon)
+            .setDisplaySize(iconX, iconY)
+            .setSize(iconX, iconY);
+
+        // muteSound() needs to access this global
+        if (dockText == 'Volume') {
+            this.volImg = myIcon;
+        }
+        //let myText = this.add.text(0, 0, dockText, iconBoxStyle)
+        //    .setDepth(4);
+        myContainer.data.set('type', dockText);
+        myContainer.add(myIcon);
+        // myContainer.add(myText);
+        myContainer.setInteractive()
+           .on('pointerdown', this.dockCalls, this);
+    }
+
     showPoweredByVim()
     {
         console.log('alo');
     }
 }
+
+
