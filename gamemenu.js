@@ -129,16 +129,20 @@ class gameMenu extends baseScene
             .setDepth(4)
             .on('pointerdown', this.showRules, this);
 
-        this.vimIcon = this.add.image(38 + this.dockBoxWidth, this.dockBoxHeight + 31, 'vimicon')
-            .setDisplaySize(36, 36)
-            .setInteractive()
+        // New style buttons. Much better when the whole dock is clickable
+        let vimContainer = this.add.container(38 + this.dockBoxWidth, this.dockBoxHeight + 31)
+            .setSize(this.dockBoxWidth, this.dockBoxHeight)
             .setDepth(4)
+            .setInteractive()
             .on('pointerdown', this.showPoweredByVim, this);
+        vimContainer.add(this.add.sprite(0, 0, 'vimicon').setDisplaySize(36,36));
+        vimContainer.add(this.add.text(0, 25, 'Vim', iconBoxStyle).setDepth(4));
+        this.physics.world.enable(vimContainer);
+
 
         this.add.text(17,55, 'Volume', iconBoxStyle).setDepth(4);
         this.add.text(17 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
         this.add.text(17,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
-        this.add.text(17 + this.dockBoxWidth, 55 + this.dockBoxHeight, 'Vim', iconBoxStyle).setDepth(4);
 
         // MAIN dock box shadows
         // Left shadow
@@ -360,5 +364,6 @@ it out.  We did, so it can't be too hard."
 
     showPoweredByVim()
     {
+        console.log('alo');
     }
 }
