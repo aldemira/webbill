@@ -25,6 +25,7 @@ class gameMenu extends baseScene
         this.terminalContainer = '';
         this.aboutContainer = '';
         this.rulesContainer = '';
+        this.vimContainer = '';
         this.menuWindowContextX = 0;
         this.menuWindowContextY = 0;
         this.dockBoxHeight = 60;
@@ -39,6 +40,7 @@ class gameMenu extends baseScene
         this.shadowLineAlpha = 0.5;
         this.shadowWhite = 0xffffff;
         this.shadowGrey = 0x333637;
+        this.dockColour = 0x787878;
     }
 
     preload()
@@ -53,6 +55,7 @@ class gameMenu extends baseScene
         this.load.image('xbillabout', 'images/xbill-about.png');
         this.load.image('abouticon', 'images/about.svg');
         this.load.image('rulesicon', 'images/rules.svg');
+        this.load.image('vimicon', 'images/vimlogo.svg');
         // this.load.image('xwindowbox','images/xwindow.png');
 
     }
@@ -87,21 +90,26 @@ class gameMenu extends baseScene
             .fillRect(5, 5, this.dockMainWidth, this.dockMainHeight);
 
         let volIconBox = this.add.graphics();
-        volIconBox.fillStyle(0x787878, alpha)
+        volIconBox.fillStyle(this.dockColour, alpha)
             .setDepth(3)
             .fillRect(10, 10, this.dockBoxWidth , this.dockBoxHeight)
             .setInteractive()
             .on('pointerdown', this.muteSound, this);
 
         let rulesIconBox = this.add.graphics();
-        rulesIconBox.fillStyle(0x787878, alpha)
+        rulesIconBox.fillStyle(this.dockColour, alpha)
             .setDepth(3)
             .fillRect(11 + this.dockBoxWidth, 10, this.dockBoxWidth, this.dockBoxHeight);
 
         let aboutIconBox = this.add.graphics();
-        aboutIconBox.fillStyle(0x787878, alpha)
+        aboutIconBox.fillStyle(this.dockColour, alpha)
             .setDepth(3)
             .fillRect(10, 11+this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
+
+        let vimDock = this.add.graphics();
+        vimDock.fillStyle(this.dockColour, alpha)
+            .setDepth(3)
+            .fillRect(11 + this.dockBoxWidth, 11 + this.dockBoxHeight, this.dockBoxWidth, this.dockBoxHeight);
 
         this.volImg = this.add.image(38, 31, myVolIcon)
             .setDisplaySize(36, 36)
@@ -121,10 +129,16 @@ class gameMenu extends baseScene
             .setDepth(4)
             .on('pointerdown', this.showRules, this);
 
+        this.vimIcon = this.add.image(38 + this.dockBoxWidth, this.dockBoxHeight + 31, 'vimicon')
+            .setDisplaySize(36, 36)
+            .setInteractive()
+            .setDepth(4)
+            .on('pointerdown', this.showPoweredByVim, this);
 
         this.add.text(17,55, 'Volume', iconBoxStyle).setDepth(4);
         this.add.text(17 + this.dockBoxWidth, 55, 'Rules', iconBoxStyle).setDepth(4);
         this.add.text(17,55 + this.dockBoxHeight, 'About', iconBoxStyle).setDepth(4);
+        this.add.text(17 + this.dockBoxWidth, 55 + this.dockBoxHeight, 'Vim', iconBoxStyle).setDepth(4);
 
         // MAIN dock box shadows
         // Left shadow
@@ -342,5 +356,9 @@ it out.  We did, so it can't be too hard."
             myIcon = "volume-unmute";
         }
         this.volImg.setTexture(myIcon);
+    }
+
+    showPoweredByVim()
+    {
     }
 }
