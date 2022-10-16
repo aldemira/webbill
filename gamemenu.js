@@ -38,6 +38,7 @@ class gameMenu extends baseScene
         this.load.image('rulesicon', 'images/rules.svg');
         this.load.image('vimicon', 'images/vimlogo.svg');
         this.load.image('clipicon', 'images/clip.png');
+        this.load.image('tile', 'images/tile.png');
         // this.load.image('xwindowbox','images/xwindow.png');
 
     }
@@ -281,27 +282,16 @@ it out.  We did, so it can't be too hard."
 
         let myDockBox = this.add.graphics()
              .setDepth(1);
+
+        let myTile = this.add.image(0, 0, 'tile')
+            .setOrigin(0)
+            .setDisplaySize(dockBoxWidth, dockBoxHeight);
+        myContainer.add(myTile);
+        /*
         myDockBox.fillGradientStyle(dockColour1, dockColour2, dockColour2, dockColour2, 1);
         myDockBox.fillRect(0, 0, dockBoxWidth, dockBoxHeight);
+        */
         myContainer.add(myDockBox);
-
-        // dock box shadows
-        // Left shadow
-        var myLine = new Phaser.Geom.Line(0, 0, 0, 0 + dockMainLineHeight);
-        myDockBox.lineStyle(shadowLineThickness, shadowWhite, shadowLineAlpha)
-            .strokeLineShape(myLine);
-        // top shadow
-        myLine = new Phaser.Geom.Line(1, 0, dockMainLineWidth, 0);
-        myDockBox.strokeLineShape(myLine);
-
-        // right Shadow
-        myLine = new Phaser.Geom.Line(dockMainLineWidth - 1, 0, 0 + dockMainLineWidth, 0 + dockMainLineHeight);
-        myDockBox.lineStyle(shadowLineThickness, shadowGrey, shadowLineAlpha)
-        .strokeLineShape(myLine);
-
-        // bottom shadow
-        myLine = new Phaser.Geom.Line(0, 0 + dockMainLineHeight, 0 + dockMainLineWidth, 0 + dockMainLineHeight);
-        myDockBox.strokeLineShape(myLine);
 
         console.log('Adding: ' + dockText);
 
@@ -327,7 +317,7 @@ it out.  We did, so it can't be too hard."
                 .setDepth(4);
             myContainer.add(myText);
 
-            myLine = new Phaser.Geom.Line(0, dockBoxHeight - 24, 24, dockBoxHeight);
+            let myLine = new Phaser.Geom.Line(0, dockBoxHeight - 24, 24, dockBoxHeight);
             myDockBox.lineStyle(2, shadowBlack, shadowLineAlpha)
                 .strokeLineShape(myLine);
 
