@@ -37,6 +37,7 @@ class gameMenu extends baseScene
         this.load.image('abouticon', 'images/about.svg');
         this.load.image('rulesicon', 'images/rules.svg');
         this.load.image('vimicon', 'images/vimlogo.svg');
+        this.load.image('clipicon', 'images/clip.png');
         // this.load.image('xwindowbox','images/xwindow.png');
 
     }
@@ -63,7 +64,9 @@ class gameMenu extends baseScene
         this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
         this.rulesContainer.setVisible(false);
 
-        const docks = [{text: 'Volume', icon: myVolIcon}, 
+        const docks =
+            [{text: 'Main', icon: 'clipicon'},
+            {text: 'Volume', icon: myVolIcon},
             {text: 'Rules', icon: 'rulesicon'},
             {text: 'About', icon: 'abouticon'},
             {text: 'Vim', icon: 'vimicon'}];
@@ -100,7 +103,8 @@ class gameMenu extends baseScene
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
-        this.terminalContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY, [menuTerminal, startButton]);
+        this.terminalContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY, [menuTerminal, startButton])
+            .setSize(menuTerminal.width, menuTerminal.height);
 
         let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
             .setOrigin(0.5)
@@ -262,6 +266,8 @@ it out.  We did, so it can't be too hard."
         let dockColour2 = 0x515561;
         let shadowWhite = 0xffffff;
         let shadowGrey = 0x333637;
+        let shadowBlack = 0x000000;
+        let iconPadding = 20;
 
         const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
         let alpha = 0.5 + ((0 / 10) * 0.5);
@@ -299,21 +305,40 @@ it out.  We did, so it can't be too hard."
 
         console.log('Adding: ' + dockText);
 
-        let iconX = dockBoxWidth - 8;
-        let iconY = dockBoxHeight - 8;
-        let myIcon = this.add.image(iconX / 2, iconY /2, icon)
-            .setDisplaySize(iconX, iconY)
-            .setSize(iconX, iconY);
+        let iconX = dockBoxWidth - iconPadding;
+        let iconY = dockBoxHeight - iconPadding;
+        let myIcon = this.add.image(iconX / 1.5, iconY /1.5, icon)
+            .setOrigin(0.5, 0.5)
+            .setSize(iconX, iconY)
+            .setDisplaySize(iconX, iconY);
 
         // muteSound() needs to access this global
         if (dockText == 'Volume') {
             this.volImg = myIcon;
         }
-        //let myText = this.add.text(0, 0, dockText, iconBoxStyle)
-        //    .setDepth(4);
         myContainer.data.set('type', dockText);
         myContainer.add(myIcon);
-        // myContainer.add(myText);
+
+        if (dockText == 'Main') {
+            let myText = this.add.text(20, dockBoxHeight - 15, dockText, iconBoxStyle)
+                .setDepth(4);
+            myContainer.add(myText);
+            myText = this.add.text(15, 5, '1', iconBoxStyle)
+                .setDepth(4);
+            myContainer.add(myText);
+
+            myLine = new Phaser.Geom.Line(0, dockBoxHeight - 24, 24, dockBoxHeight);
+            myDockBox.lineStyle(2, shadowBlack, shadowLineAlpha)
+                .strokeLineShape(myLine);
+
+            myLine = new Phaser.Geom.Line(dockBoxWidth - 24, 0, dockBoxWidth - 1, 24);
+            myDockBox.strokeLineShape(myLine);
+
+            let myTriangles = this.add.graphics().fillStyle(shadowBlack);
+            myTriangles.fillTriangle(4, dockBoxHeight - 16, 4, dockBoxHeight - 6, 16 , dockBoxHeight - 6);
+            myTriangles.fillTriangle(dockBoxWidth - 16,  4, dockBoxWidth - 6, 4, dockBoxWidth - 6, 16);
+            myContainer.add(myTriangles);
+        }
         myContainer.setInteractive()
            .on('pointerdown', this.dockCalls, this);
     }

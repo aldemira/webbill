@@ -68,20 +68,6 @@ class baseScene extends Phaser.Scene
     {
     }
 
-    createButton(x, y, label, callback)
-    {
-        let myBtn = this.add.text(x, y, label)
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setStyle({ backgroundColor: '#111' })
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => callback())
-            .on('pointerover', () => myBtn.setStyle({ fill: '#f39c12' }))
-            .on('pointerout', () => myBtn.setStyle({ fill: '#FFF' }));
-
-        return myBtn;
-    }
-
     toggleMute()
     {
         if (!this.game.sound.mute) {

@@ -18,14 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    backgroundColor: '#ffffff',
+    parent: 'gameContainer',
+    transparent: 'true',
     pixelArt: true,
     // Set this for game-over
     // backgroundColor: '#4488aa',
     physics: {
-        default: 'arcade'
+        default: 'arcade',
     },
     scene: [ gameMenu, webBill ],
     version: 0.1
