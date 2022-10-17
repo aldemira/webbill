@@ -67,6 +67,7 @@ class gameMenu extends baseScene
         this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
         this.rulesContainer.setVisible(false);
 
+        /* Dock Icon Ops */
         const docks =
             [{text: 'Main', icon: 'clipicon'},
             {text: 'Volume', icon: myVolIcon},
@@ -78,27 +79,18 @@ class gameMenu extends baseScene
             this.createDockButton(i, 0, docks[i]['icon'], docks[i]['text'], this);
         }
 
-        this.createXWindow(500, 200, 200, 100, 'boss mode!');
-        return;
+        /* End Dock Icon Ops */
 
+        /* Game Menu Windows */
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
-        // Need to pass this to functions and whatnot
-        let myContext = this;
-        this.add.image(myWidth / 2, myHeight * 0.2, 'logo').setDepth(1);
-        // TODO move these into a billSprite class
-        let bill1 = this.add.sprite(0, 0, 'billL0').play('billLAnim');
-        let bill2 = this.add.sprite(0, 0, 'billR0').play('billRAnim');
-        let win1 = this.add.image(0, -20, 'wingdows');
-        let win2 = this.add.image(0, -20, 'wingdows');
-        let container1 = this.add.container((myWidth / 2 ) - 200, myHeight * 0.2, [win1, bill1]);
-        let container2 = this.add.container((myWidth / 2 ) + 200, myHeight * 0.2, [win2, bill2]);
 
-        let menuTerminal = this.add.image(0, 0, 'terminal').setDepth(0);
+        let mainWindow = new wmaker(this);
+        mainWindow.createXWindow(myWidth / 4, myHeight / 3, 440, 200, 'Terminal');
 
         const textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", fixedWidth: 370, backgroundColor: '#fff' };
-        let startButton = this.add.text(-40 , -100, 'bash-3.14 ~# ', textStyle)
-            .setOrigin(0.5)
+        let startButton = this.add.text(10, 30, 'bash-3.14 ~# ', textStyle)
+            .setOrigin(0)
             .setPadding(10)
             .setDepth(1)
             .setInteractive({ useHandCursor: true })
@@ -109,8 +101,31 @@ class gameMenu extends baseScene
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
-        this.terminalContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY, [menuTerminal, startButton])
-            .setSize(menuTerminal.width, menuTerminal.height);
+        // WARNING tWindow.windowContainer only contains the last create container!
+        mainWindow.windowContainer.add(startButton);
+        mainWindow.createXWindow(myWidth / 6, myHeight / 2, 500, 100, 'XLogo');
+
+        // Need to pass this to functions and whatnot
+        let myContext = this;
+        let gameLogo = this.add.image(250, 75, 'logo')
+            .setDepth(1);
+        // TODO move these into a billSprite class
+        let bill1 = this.add.sprite(0, 0, 'billL0').play('billLAnim');
+        let bill2 = this.add.sprite(0, 0, 'billR0').play('billRAnim');
+        let win1 = this.add.image(0, -20, 'wingdows');
+        let win2 = this.add.image(0, -20, 'wingdows');
+        /*
+        let container1 = this.add.container((myWidth / 2 ) - 200, myHeight * 0.2, [win1, bill1]);
+        let container2 = this.add.container((myWidth / 2 ) + 200, myHeight * 0.2, [win2, bill2]);
+        */
+
+        let container1 = this.add.container(40, 75, [win1, bill1]);
+        let container2 = this.add.container(460, 75, [win2, bill2]);
+        mainWindow.windowContainer.add([container1, gameLogo, container2]);
+
+
+        /* End Game Menu Windows */
+
 
         let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
             .setOrigin(0.5)
@@ -336,76 +351,6 @@ it out.  We did, so it can't be too hard."
         }
         myContainer.setInteractive()
            .on('pointerdown', this.dockCalls, this);
-    }
-
-
-    createXWindow(x, y, windowWidth, windowHeight, windowText)
-    {
-        // pulled of from windowmaker.org
-        let lightBorder = 0xb6b6b6;
-        let darkBorder = 0x616161;
-        let black = 0x000000;
-        let white = 0xffffff;
-
-        let myContainer = this.add.container(x, y)
-            .setSize(windowWidth, windowHeight)
-            .setDepth(4);
-
-        let myTitle = this.add.graphics()
-            .lineStyle(1, lightBorder, 1)
-            .fillStyle(black);
-
-        myTitle.fillRect(0, 0, windowWidth, 20);
-
-        let myLine = new Phaser.Geom.Line(0, 0, 0, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(0, 0, 20, 0);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(21, 0, 21, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(21, 0, windowWidth - 21, 0);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(windowWidth - 20, 0, windowWidth - 20, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(windowWidth - 20, 0, windowWidth, 0);
-        myTitle.strokeLineShape(myLine);
-
-        myTitle.lineStyle(1, darkBorder, 1);
-        myLine = new Phaser.Geom.Line(0, 20, 20, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(20, 0, 20, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(21, 20, windowWidth - 21, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(windowWidth - 21, 0, windowWidth - 21, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(windowWidth - 21, 20, windowWidth, 20);
-        myTitle.strokeLineShape(myLine);
-        myLine = new Phaser.Geom.Line(windowWidth, 0, windowWidth, 20);
-        myTitle.strokeLineShape(myLine);
-
-        myContainer.add(myTitle);
-
-        let myWindow = this.add.graphics()
-            .lineStyle(1, black, 1)
-            .fillStyle(white);
-
-        myWindow.fillRect(0, 21, windowWidth, windowHeight);
-        myWindow.strokeRect(0, 21, windowWidth, windowHeight);
-        myContainer.add(myWindow);
-
-        let minimize = this.add.image(10,10,'minimize')
-            .setOrigin(0.5);
-        myContainer.add(minimize);
-        let close = this.add.image(windowWidth - 10, 10, 'close')
-            .setOrigin(0.5);
-        myContainer.add(close);
-
-        const textStyle = { fontFamily: "Menlo Regular", fill: "#fff", fontSize: "10px" };
-        let myText = this.add.text(windowWidth / 2, 10, windowText, textStyle)
-            .setOrigin(0.5);
-        myContainer.add(myText);
-
     }
 
     showPoweredByVim()
