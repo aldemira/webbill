@@ -67,6 +67,10 @@ class gameMenu extends baseScene
         this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
         this.rulesContainer.setVisible(false);
 
+        let myWidth = this.game.renderer.width;
+        let myHeight = this.game.renderer.height;
+
+        let mainWindow = new wmaker(this);
         /* Dock Icon Ops */
         const docks =
             [{text: 'Main', icon: 'clipicon'},
@@ -76,16 +80,12 @@ class gameMenu extends baseScene
             {text: 'Vim', icon: 'vimicon'}];
 
         for (let i=0;i<docks.length;i++) {
-            this.createDockButton(i, 0, docks[i]['icon'], docks[i]['text'], this);
+            mainWindow.createDockButton(i, 0, docks[i]['icon'], docks[i]['text'], this);
         }
 
         /* End Dock Icon Ops */
 
         /* Game Menu Windows */
-        let myWidth = this.game.renderer.width;
-        let myHeight = this.game.renderer.height;
-
-        let mainWindow = new wmaker(this);
         mainWindow.createXWindow(myWidth / 4, myHeight / 3, 440, 200, 'Terminal');
 
         const textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", fixedWidth: 370, backgroundColor: '#fff' };
@@ -266,91 +266,6 @@ it out.  We did, so it can't be too hard."
             myIcon = "volume-unmute";
         }
         this.volImg.setTexture(myIcon);
-    }
-
-/*
- * vrow => int, vertical row
- * hrow => int, horizontal row
- * icon => string, previously loaded image 
- * dockText => string, docker text to place under icon
- * callback => function, function to call on click
- */
-    createDockButton(vrow, hrow, icon, dockText)
-    {
-        let dockBoxHeight = 64;
-        let dockBoxWidth = 64;
-        let shadowLineThickness = 3;
-        let dockMainLineWidth = dockBoxWidth - shadowLineThickness;
-        let dockMainLineHeight = dockBoxHeight - shadowLineThickness;
-        let shadowLineAlpha = 0.5;
-        let dockColour1 = 0xa6a6b6;
-        let dockColour2 = 0x515561;
-        let shadowWhite = 0xffffff;
-        let shadowGrey = 0x333637;
-        let shadowBlack = 0x000000;
-        let iconPadding = 20;
-
-        const iconBoxStyle = { fontFamily: "Menlo Regular", fontSize: 10, fill: "#000"};
-        let alpha = 0.5 + ((0 / 10) * 0.5);
-        // For simplicity let's have single line of column regardless
-        hrow = 0;
-        //let myContainer = this.add.container(1, 1)
-        let myContainer = this.add.container((dockBoxWidth * hrow), dockBoxHeight * vrow)
-            .setDataEnabled()
-            .setSize(dockBoxWidth, dockBoxHeight)
-            .setDepth(4);
-
-        let myDockBox = this.add.graphics()
-             .setDepth(1);
-
-        let myTile = this.add.image(0, 0, 'tile')
-            .setOrigin(0)
-            .setDisplaySize(dockBoxWidth, dockBoxHeight);
-        myContainer.add(myTile);
-        /*
-        myDockBox.fillGradientStyle(dockColour1, dockColour2, dockColour2, dockColour2, 1);
-        myDockBox.fillRect(0, 0, dockBoxWidth, dockBoxHeight);
-        */
-        myContainer.add(myDockBox);
-
-        console.log('Adding: ' + dockText);
-
-        let iconX = dockBoxWidth - iconPadding;
-        let iconY = dockBoxHeight - iconPadding;
-        let myIcon = this.add.image(iconX / 1.5, iconY /1.5, icon)
-            .setOrigin(0.5, 0.5)
-            .setSize(iconX, iconY)
-            .setDisplaySize(iconX, iconY);
-
-        // muteSound() needs to access this global
-        if (dockText == 'Volume') {
-            this.volImg = myIcon;
-        }
-        myContainer.data.set('type', dockText);
-        myContainer.add(myIcon);
-
-        if (dockText == 'Main') {
-            let myText = this.add.text(20, dockBoxHeight - 15, dockText, iconBoxStyle)
-                .setDepth(4);
-            myContainer.add(myText);
-            myText = this.add.text(15, 5, '1', iconBoxStyle)
-                .setDepth(4);
-            myContainer.add(myText);
-
-            let myLine = new Phaser.Geom.Line(0, dockBoxHeight - 24, 24, dockBoxHeight);
-            myDockBox.lineStyle(2, shadowBlack, shadowLineAlpha)
-                .strokeLineShape(myLine);
-
-            myLine = new Phaser.Geom.Line(dockBoxWidth - 24, 0, dockBoxWidth - 1, 24);
-            myDockBox.strokeLineShape(myLine);
-
-            let myTriangles = this.add.graphics().fillStyle(shadowBlack);
-            myTriangles.fillTriangle(4, dockBoxHeight - 16, 4, dockBoxHeight - 6, 16 , dockBoxHeight - 6);
-            myTriangles.fillTriangle(dockBoxWidth - 16,  4, dockBoxWidth - 6, 4, dockBoxWidth - 6, 16);
-            myContainer.add(myTriangles);
-        }
-        myContainer.setInteractive()
-           .on('pointerdown', this.dockCalls, this);
     }
 
     showPoweredByVim()
