@@ -41,7 +41,8 @@ class gameMenu extends baseScene
         this.load.image('tile', 'images/tile.png');
         this.load.image('minimize', 'images/minimize.png');
         this.load.image('close', 'images/close.png');
-        // this.load.image('xwindowbox','images/xwindow.png');
+        this.load.image('terminalicon', 'images/TerminalGNUstep.png');
+        this.load.image('xlogo', 'images/xorg-logo.svg');
 
     }
 
@@ -77,6 +78,8 @@ class gameMenu extends baseScene
             {text: 'Volume', icon: myVolIcon},
             {text: 'Rules', icon: 'rulesicon'},
             {text: 'About', icon: 'abouticon'},
+            {text: 'Terminal', icon: 'terminalicon'},
+            {text: 'Xorg', icon: 'xlogo'},
             {text: 'Vim', icon: 'vimicon'}];
 
         for (let i=0;i<docks.length;i++) {
