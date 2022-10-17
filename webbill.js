@@ -105,6 +105,8 @@ class webBill extends baseScene
     create()
     {
         super.create();
+        var div = document.getElementById('gameContainer');
+        div.style.backgroundColor = "#FFFFFF"; // Window maker Default Style
 
         // Scene specific animations
         this.anims.create({
