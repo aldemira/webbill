@@ -141,7 +141,7 @@ class gameMenu extends baseScene
         this.terminalWindow = mainWindow.createXWindow(
             myWidth / 4, myHeight / 3, 440, 200, 'Terminal');
 
-        const textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", fixedWidth: 370, backgroundColor: '#fff' };
+        let textStyle = { fontFamily: "Menlo Regular", fill: "#4af626", align: "left", fontSize: "26px", backgroundColor: '#fff' };
         let startButton = this.add.text(10, 30, 'bash-3.14 ~# ', textStyle)
             .setOrigin(0)
             .setPadding(10)
@@ -154,8 +154,7 @@ class gameMenu extends baseScene
             .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
             .on('pointerout', () => startButton.setStyle({ fill: '#4af626' }));
 
-        // WARNING tWindow.windowContainer only contains the last create container!
-        mainWindow.windowContainer.add(startButton);
+        this.terminalWindow.add(startButton);
         this.logoWindow = mainWindow.createXWindow(
             myWidth / 6, myHeight / 2, 500, 100, 'XLogo');
 
@@ -171,9 +170,17 @@ class gameMenu extends baseScene
 
         let container1 = this.add.container(40, 75, [win1, bill1]);
         let container2 = this.add.container(460, 75, [win2, bill2]);
-        mainWindow.windowContainer.add([container1, gameLogo, container2]);
+        this.logoWindow.add([container1, gameLogo, container2]);
 
-        this.vimWindow = mainWindow.createXWindow(myWidth/3, myHeight / 6, 300, 300, 'Powered by Vim', true);
+        // Hidden -> true
+        this.vimWindow = mainWindow.createXWindow(myWidth/3, myHeight / 6, 300, 150, 'Powered by Vim', true);
+        //textStyle = { fontFamily: "Menlo Regular", fill: "#000", align: "left", fontSize: "14px", backgroundColor: '#fff' };
+        textStyle['fill'] = '#000';
+        textStyle['fontSize'] = '14px';
+        let vimText = this.add.text(10, 30, "~ This game is written in Vim only\n~ \n~ \n~ \n~ \n~ \n~ \n~ ", textStyle)
+            .setOrigin(0)
+            .setDepth(1)
+        this.vimWindow.add(vimText);
 
 
         /* End Game Menu Windows */
@@ -214,10 +221,6 @@ class gameMenu extends baseScene
 
         this.typewriteText('Start Game', startButton);
 
-        let showPoweredByVim = () =>
-        {
-            vimWindow.setVisible(true);
-        }
     }
 
     update()
