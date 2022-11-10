@@ -5,7 +5,7 @@ class wmaker
         this.context = context;
     }
 
-    createXWindow(x, y, windowWidth, windowHeight, windowText)
+    createXWindow(x, y, windowWidth, windowHeight, windowText, hidden = false)
     {
         // pulled of from windowmaker.org
         let lightBorder = 0xb6b6b6;
@@ -74,7 +74,10 @@ class wmaker
             .setOrigin(0.5);
         myContainer.add(myText);
 
+        myContainer.setVisible(!hidden);
+
         this.windowContainer = myContainer;
+        return myContainer;
     }
 
 /*
@@ -181,7 +184,10 @@ class wmaker
             myContainer.add(myTriangles);
             */
         }
-        myContainer.setInteractive()
-           .on('pointerdown', this.context.dockCalls, this.context);
+        myContainer.setInteractive();
+       //.on('pointerdown', this.context.dockCalls, this.context);
+       return myContainer;
+
+        //this.dockContainer = myContainer;
     }
 }
