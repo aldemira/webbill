@@ -71,51 +71,18 @@ class gameMenu extends baseScene
             myVolIcon = "volume-unmute";
         }
 
-        // Generate About and Rules windows here
-        // TODO use pygtk to create real windows 
-        // and get screenshots from it.
-        /*
-        this.aboutWindow = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
-        this.aboutWindow.setVisible(false);
-
-        this.rulesContainer = this.add.container(this.menuWindowContextX, this.menuWindowContextY);
-        this.rulesContainer.setVisible(false);
-        */
-
         let myWidth = this.game.renderer.width;
         let myHeight = this.game.renderer.height;
 
+        // Create a fake window maker
         let mainWindow = new wmaker(this);
+
         /* Dock Icon Ops */
         /* I hate JS!!!
         // I tried to loop and create a msp but when I attach
         // newly created container to the object for some reason
         // the somtimes wrong functions are fired. It musn't be my mistake is it?
-        */
-
-        /*
-
-        var docks = { 'main' : { icon: 'clipicon', container: '' },
-             'volume' : { icon: myVolIcon, container: '' },
-             'rules' : { icon: 'rulesicon', container: '' },
-             'about' : { icon: 'abouticon', container: '' },
-             'terminal' : { icon: 'terminalicon', container: '' },
-             'xorg' : { icon: 'xlogo', container: '' },
-             'vim' : { icon: 'vimicon', container: '' }};
-        let i = 0;
-        for (const [key, value] of Object.entries(docks)) {
-            let curContainer;
-            value['container'] = mainWindow.createDockButton(
-                i, 0, value['icon'], key, this);
-            curContainer = value['container'];
-            // docks[i]['container'] = mainWindow.dockContainer;
-            curContainer.on('pointerdown', function() { 
-                myContext.dockCalls(value['container'])
-            });
-            console.log(key, value);
-            i++;
-        }
-
+        // Maybe it is :(
         */
 
         // args -> row, col, icon, text, context
@@ -182,29 +149,30 @@ class gameMenu extends baseScene
             .setDepth(1)
         this.vimWindow.add(vimText);
 
+        let ruleText = "xBill has been painstakingly designed and\nresearched in order to make it as easy to use\nfor the whole family as it is for little Sally.\nYears - nay - days of beta testing and \nconsulting with the cheapest of human interface\ndesigners have resulted in a game that is easy\nto use, yet nothing at all like a Macintosh.\n\nI.   Whack the Bills (click)\nII.  Restart the computer (click)\nIII. Pick up stolen OSes & return(drag)\nthem to their respective computers\nIV.  Drag the bucket to extinguish sparks\nV.   Scoring is based on total uptime,\nwith bonuses for killing Bills.\n\nAs for the rest, you can probably figure\nit out.  We did, so it can't be too hard.";
+        // Hidden -> true
+        this.rulesWindow = mainWindow.createXWindow(myWidth/2, myHeight / 6, 430, 375, 'Rules', true);
+        let ruleText2Add = this.add.text(10,30, ruleText, textStyle)
+            .setOrigin(0)
+            .setDepth(1);
+        this.rulesWindow.add(ruleText2Add);
 
+        this.aboutWindow = mainWindow.createXWindow(myWidth/3, myHeight / 5, 400, 350, 'About', true);
+        let aboutText = this.add.text(10, 30, 'More popular than Quake!\nOriginal concept designed and', textStyle)
+            .setOrigin(0)
+            .setDepth(1);
+
+        let aboutlogo = this.add.image(200, 150, 'xbillabout')
+            .setDepth(2);
+
+        let aboutText2 = this.add.text(10, 175, 'Written by Aldemir Akpinar.')
+            .setOrigin(0)
+            .setDepth(1);
+
+        this.aboutWindow.add([aboutText, aboutlogo, aboutText2]);
         /* End Game Menu Windows */
 
 
-        let okButton = this.add.text((myWidth / 2) - 40, (myHeight / 2) + 150 , 'OK', textStyle)
-            .setOrigin(0.5)
-            .setPadding(10)
-            .setDepth(1)
-            .setStyle({border: 1, fontSize: 18})
-            .setInteractive({ useHandCursor: true})
-            .setVisible(false)
-            .on('pointerover', () => aboutButton.setStyle({ fill: '#f39c12' }))
-            .on('pointerout', () => aboutButton.setStyle({ fill: '#4af626' }));
-
-        let aboutimg = myContext.add.image((myWidth / 2) - 40, (myHeight / 2) + 40, 'about').setDepth(5).setVisible(false);
-
-        okButton.on('pointerdown', function() {
-            this.setVisible(false);
-            aboutimg.setVisible(false);
-            startButton.setVisible(true);
-            rulesButton.setVisible(true);
-            aboutButton.setVisible(true);
-        });
 
         this.sound.play('hdd',{
             loop: true
@@ -269,26 +237,6 @@ class gameMenu extends baseScene
 
     showRules()
     {
-        let ruleText = `
-        xBill has been painstakingly designed and\n
-researched in order to make it as easy to use\n
-for the whole family as it is for little Sally.\n
-Years - nay - days of beta testing and \n
-consulting with the cheapest of human interface\n
-designers have resulted in a game that is easy\n
-to use, yet nothing at all like a Macintosh.\n
-\n
-I.   Whack the Bills (click)\n
-II.  Restart the computer (click)\n
-III. Pick up stolen OSes & return(drag)\n
-     them to their respective computers\n
-IV.  Drag the bucket to extinguish sparks\n
-V.   Scoring is based on total uptime,\n
-     with bonuses for killing Bills.\n
-\n\
-As for the rest, you can probably figure\n
-it out.  We did, so it can't be too hard.
-        `;
 
     }
 
