@@ -235,11 +235,6 @@ class gameMenu extends baseScene
         });
     }
 
-    showRules()
-    {
-
-    }
-
     muteSound()
     {
         let myIcon = '';

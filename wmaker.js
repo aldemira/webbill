@@ -5,6 +5,7 @@ class wmaker
         this.context = context;
     }
 
+    // Creates a dismissible gui window
     createXWindow(x, y, windowWidth, windowHeight, windowText, hidden = false)
     {
         // pulled of from windowmaker.org
@@ -109,6 +110,7 @@ class wmaker
 
         let myContainer = this.context.add.container((dockBoxWidth * hrow), dockBoxHeight * vrow)
             .setDataEnabled()
+            .setInteractive()
             .setSize(dockBoxWidth, dockBoxHeight)
             .setDepth(4);
 
@@ -125,8 +127,6 @@ class wmaker
         */
         myContainer.add(myDockBox);
 
-        console.log('Adding: ' + dockText);
-
         let iconX = dockBoxWidth - iconPadding;
         let iconY = dockBoxHeight - iconPadding;
         let myIcon = this.context.add.image(iconX / 1.5, iconY /1.5, icon)
@@ -141,6 +141,7 @@ class wmaker
         myContainer.data.set('type', dockText);
         myContainer.add(myIcon);
 
+        // Main dock icon has two filled triangles top righ and bottom left
         if (dockText == 'Main') {
             let myText = this.context.add.text(30, dockBoxHeight - 15, dockText, iconBoxStyle)
                 .setDepth(4);
@@ -149,42 +150,48 @@ class wmaker
                 .setDepth(4);
             myContainer.add(myText);
 
+
             // Diagonal lines, Mini triangles and their shadows
-            let myLine = new Phaser.Geom.Line(0, dockBoxHeight * 0.55, dockBoxWidth - (dockBoxWidth * 0.55), dockBoxHeight);
-            myDockBox.lineStyle(2, shadowBlack, shadowLineAlpha)
+            shadowLineAlpha = 0.7;
+            let lineThickness = 2;
+            // diag bottom Left white shadow
+            let myLine = new Phaser.Geom.Line(0, dockBoxHeight * 0.55 + 1, dockBoxWidth - (dockBoxWidth * 0.55) - 1, dockBoxHeight);
+            myDockBox.lineStyle(lineThickness, shadowWhite, shadowLineAlpha)
                 .strokeLineShape(myLine);
 
+            // diag Top Right white shadow
+            myLine = new Phaser.Geom.Line((dockBoxWidth * 0.55 ) - 1, 0, dockBoxWidth, dockBoxHeight - (dockBoxHeight * 0.55) + 1);
+            myDockBox.lineStyle(lineThickness, shadowWhite, shadowLineAlpha)
+                .strokeLineShape(myLine);
+
+            lineThickness = 1;
+            // diag Bottom left
+            myLine = new Phaser.Geom.Line(0, dockBoxHeight * 0.55, dockBoxWidth - (dockBoxWidth * 0.55), dockBoxHeight);
+            myDockBox.lineStyle(lineThickness, shadowBlack, shadowLineAlpha)
+                .strokeLineShape(myLine);
+
+            // diag Top Right
             myLine = new Phaser.Geom.Line(dockBoxWidth * 0.55, 0, dockBoxWidth, dockBoxHeight - (dockBoxHeight * 0.55));
             myDockBox.strokeLineShape(myLine);
 
-            myLine = new Phaser.Geom.Line((dockBoxWidth * 0.55 ) - 1, 0, dockBoxWidth, dockBoxHeight - (dockBoxHeight * 0.55) + 1);
-            myDockBox.lineStyle(1, shadowWhite, shadowLineAlpha)
+            // Bottom Triangle
+            myDockBox.fillStyle(shadowBlack, shadowLineAlpha)
+                .fillTriangle(5, (dockBoxHeight * 0.55 ) + 12, 5, dockBoxHeight - 5, 5 + 12, dockBoxHeight - 5);
+
+            // Top Triangle
+            myDockBox.fillTriangle((dockBoxWidth * 0.55) + 12, 5, dockBoxWidth - 5, 5 , dockBoxWidth - 5,dockBoxHeight - (dockBoxHeight * 0.55) - 12);
+
+            lineThickness = 2;
+            // Bottom triangle white shadow
+            myLine = new Phaser.Geom.Line(5, dockBoxHeight - 5,  5 + 12, dockBoxHeight - 5)
+            myDockBox.lineStyle(lineThickness, shadowWhite, shadowLineAlpha)
                 .strokeLineShape(myLine);
-            myLine = new Phaser.Geom.Line(0, (dockBoxHeight * 0.55) + 1, dockBoxWidth - (dockBoxWidth * 0.55) - 1 , dockBoxHeight);
+
+            // Top triangle white shadow
+            myLine = new Phaser.Geom.Line(dockBoxWidth - 5, 5,  dockBoxWidth - 5, dockBoxHeight - (dockBoxHeight * 0.55) - 12);
             myDockBox.strokeLineShape(myLine);
 
-            myLine = new Phaser.Geom.Line(4, (dockBoxHeight * 0.55 ) + 6, 4, dockBoxHeight -4);
-            myDockBox.lineStyle(1, shadowBlack, shadowLineAlpha)
-                .strokeLineShape(myLine);
-            myLine = new Phaser.Geom.Line(4, (dockBoxHeight * 0.55 ) + 8, dockBoxWidth - (dockBoxWidth * 0.55) - 8, dockBoxHeight -4);
-            myDockBox.strokeLineShape(myLine);
-
-            myLine = new Phaser.Geom.Line(4, (dockBoxHeight * 0.55 ) + 6, 4, dockBoxHeight -4);
-            myDockBox.strokeLineShape(myLine);
-            /*
-            let myTriangles = this.add.graphics()
-                .lineStyle(1, shadowWhite, shadowLineAlpha)
-                .fillStyle(shadowBlack);
-
-            //fillTriangle(x0, y0, x1, y1, x2, y2)
-            myTriangles.fillTriangle(4, (dockBoxHeight * 0.55 ) + 6, 4, dockBoxHeight - 6, (dockBoxWidth * 0.55) - 10,  dockBoxHeight - 6);
-            myLine = new Phaser.Geom.Line(4,dockBoxHeight - 6, 14, dockBoxHeight - 6);
-            myTriangles.strokeLineShape(myLine);
-            myTriangles.fillTriangle(dockBoxWidth - 16,  4, dockBoxWidth - 6, 4, dockBoxWidth - 6, 16);
-            myContainer.add(myTriangles);
-            */
         }
-        myContainer.setInteractive();
        //.on('pointerdown', this.context.dockCalls, this.context);
        return myContainer;
 
