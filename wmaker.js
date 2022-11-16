@@ -110,7 +110,6 @@ class wmaker
 
         let myContainer = this.context.add.container((dockBoxWidth * hrow), dockBoxHeight * vrow)
             .setDataEnabled()
-            .setInteractive()
             .setSize(dockBoxWidth, dockBoxHeight)
             .setDepth(4);
 
@@ -193,6 +192,7 @@ class wmaker
 
         }
        //.on('pointerdown', this.context.dockCalls, this.context);
+       myContainer.setInteractive();
        return myContainer;
 
         //this.dockContainer = myContainer;
