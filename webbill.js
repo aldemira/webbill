@@ -498,7 +498,19 @@ class webBill extends baseScene
 
     showLevelDone()
     {
-        const mybutton = this.createButton(50, 50, 'Next Level', () => this.scene.restart({level: this.curLevel+1}));
+        let mainWindow = new wmaker(this);
+        let levelDonwWindow = mainWindow.createXWindow(this.game.renderer.width/2, this.game.renderer.height/2, 430, 375, 'Level Done!', false);
+        let textStyle = { fontFamily: "Menlo Regular", fill: "#000", align: "left", fontSize: "14px", backgroundColor: '#fff' };
+        let donetext = this.add.text(10, 30, 'Level 1 done!', textStyle)
+            .setOrigin(0)
+            .setDepth(1);
+        levelDonwWindow.add(donetext);
+        donetext = this.add.text(50, 50, 'Next Level', textStyle)
+            .setInteractive()
+            .setOrigin(0)
+            .setDepth(1);
+        donetext.on('pointerdown', () => { this.scene.restart({level: this.curLevel+1}) });
+        levelDonwWindow.add(donetext);
     }
 
     createSpark()
