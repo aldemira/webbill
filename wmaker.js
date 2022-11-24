@@ -117,6 +117,7 @@ class wmaker
              .setDepth(1);
 
         let myTile = this.context.add.image(0, 0, 'tile')
+            .setInteractive()
             .setOrigin(0)
             .setDisplaySize(dockBoxWidth, dockBoxHeight);
         myContainer.add(myTile);
@@ -191,10 +192,7 @@ class wmaker
             myDockBox.strokeLineShape(myLine);
 
         }
-       //.on('pointerdown', this.context.dockCalls, this.context);
-       myContainer.setInteractive();
-       return myContainer;
 
-        //this.dockContainer = myContainer;
+       return myContainer;
     }
 }

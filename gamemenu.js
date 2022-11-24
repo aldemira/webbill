@@ -94,13 +94,14 @@ class gameMenu extends baseScene
         this.logoContainer = mainWindow.createDockButton(5, 0, 'xlogo', 'Xlogo', this);
         this.vimContainer = mainWindow.createDockButton(6, 0, 'vimicon', 'Vim', this);
 
-        this.mainContainer.on('pointerdown', this.mainWindowAction);
-        this.volContainer.on('pointerdown', this.muteSound);
-        this.rulesContainer.on('pointerdown', () => { this.rulesWindow.setVisible(true); });
-        this.aboutContainer.on('pointerdown', () => { this.aboutWindow.setVisible(true); });
-        this.termContainer.on('pointerdown', () => { this.terminalWindow.setVisible(true); });
-        this.logoContainer.on('pointerdown', () => { this.logoWindow.setVisible(true); });
-        this.vimContainer.on('pointerdown', () => { this.vimWindow.setVisible(true); });
+        // Add mouse click to the first element of the container, otherwise click boundaries aren't setup correctly.
+        this.mainContainer.list[0].on('pointerdown', this.mainWindowAction);
+        this.volContainer.list[0].on('pointerdown', this.muteSound);
+        this.rulesContainer.list[0].on('pointerdown', () => { this.rulesWindow.setVisible(true); });
+        this.aboutContainer.list[0].on('pointerdown', () => { this.aboutWindow.setVisible(true); });
+        this.termContainer.list[0].on('pointerdown', () => { this.terminalWindow.setVisible(true); });
+        this.logoContainer.list[0].on('pointerdown', () => { this.logoWindow.setVisible(true); });
+        this.vimContainer.list[0].on('pointerdown', () => { this.vimWindow.setVisible(true); });
 
         /* End Dock Icon Ops */
 
@@ -246,6 +247,6 @@ class gameMenu extends baseScene
         }
         // this.volImg.setTexture(myIcon);
         // 0 & 1 are graphics for shadows
-        this.getAt(2).setTexture(myIcon);
+        this.parentContainer.getAt(2).setTexture(myIcon);
     }
 }
