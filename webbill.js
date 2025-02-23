@@ -1,6 +1,6 @@
 /*
  WebBill
-Copyright (C) 2022  Aldemir Akpinar <aldemir.akpinar@gmail.com>
+Copyright (C) 2025  Aldemir Akpinar <aldemir.akpinar@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,42 +18,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class webBill extends baseScene
 {
-    curLevel;
+    this.curLevel = 0;
 
     constructor()
     {
         super('webBill');
 
-        this.maxComputers = 20;
-        this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
-        this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
-        this.MINPC = 6;
-        this.OSOFFSETX = -9;
-        this.OSOFFSETY = -7;
-        this.MAXBILLS = 100;
-        this.activeComp = '';
-        this.activeCompNum = 0;
-        this.deactiveCompNum = 0;
-        this.curHorde = '';
-        this.curBill = [];
-        this.levelCompArr = [];
-        this.score = 0;
-        this.timeString = ':';
-        this.timeText = '';
-        this.volImg = '';
+        var this.maxComputers = 20;
+        var this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
+        var this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
+        var this.MINPC = 6;
+        var this.OSOFFSETX = -9;
+        var this.OSOFFSETY = -7;
+        var this.MAXBILLS = 100;
+        var this.activeComp = '';
+        var this.activeCompNum = 0;
+        var this.deactiveCompNum = 0;
+        var this.curHorde = '';
+        var this.curBill = [];
+        var this.levelCompArr = [];
+        var this.score = 0;
+        var this.timeString = ':';
+        var this.timeText = '';
+        var this.volImg = '';
         // this.offScreen = 0;
-        this.billTimer = '';
-        this.efficiency = 1;
-        this.iteration = 1;
-        this.aliveBills = 0;
-        this.scoreText = '';
-        this.offScreenBillList = [];
+        var this.billTimer = '';
+        var this.efficiency = 1;
+        var this.iteration = 1;
+        var this.aliveBills = 0;
+        var this.scoreText = '';
+        var this.offScreenBillList = [];
     }
 
     init(props)
     {
         const { level = 1 } = props;
-        this.curLevel = level
+        this.curLevel = level;
     }
 
     preload()
@@ -366,6 +366,7 @@ class webBill extends baseScene
         menuText.setInteractive()
             .on('pointerdown', () => {startContainer.setVisible(!startContainer.visible); this.scene.pause(startContainer.visible);}, this);
 
+        this.monitorInfectedComputers();
     }
 
     timerCallback() {
@@ -499,22 +500,29 @@ class webBill extends baseScene
     showLevelDone()
     {
         let mainWindow = new wmaker(this);
-        let levelDonwWindow = mainWindow.createXWindow(this.game.renderer.width/2, this.game.renderer.height/2, 430, 375, 'Level Done!', false);
+        let levelDoneWindow = mainWindow.createXWindow(this.game.renderer.width/2, this.game.renderer.height/2, 430, 375, 'Level Done!', false);
         let textStyle = { fontFamily: "Menlo Regular", fill: "#000", align: "left", fontSize: "14px", backgroundColor: '#fff' };
         let donetext = this.add.text(10, 30, 'Level 1 done!', textStyle)
             .setOrigin(0)
             .setDepth(1);
-        levelDonwWindow.add(donetext);
+        levelDoneWindow.add(donetext);
         donetext = this.add.text(50, 50, 'Next Level', textStyle)
             .setInteractive()
             .setOrigin(0)
             .setDepth(1);
         donetext.on('pointerdown', () => { this.scene.restart({level: this.curLevel+1}) });
-        levelDonwWindow.add(donetext);
+        levelDoneWindow.add(donetext);
     }
 
-    createSpark()
+    createSparkOld()
     {
+        let spark = this.add.sprite(x, y, 'spark')
+            .play('flame') // Play the flame animation
+            .setDepth(25); // Ensure it's above other objects
+
+        this.time.delayedCall(500, () => {
+            spark.destroy(); // Remove the spark after 500ms
+        });
       // #define SPARK_SPEED 4
       // #define SPARK_DELAY(level) (MAX(20 - (level), 0))
       /*
@@ -529,5 +537,170 @@ class webBill extends baseScene
 
     hordeSetup(t, curLevel)
     {
+    }
+
+    createSpark(infectedComputer) {
+        // Constants for spark behavior
+        const SPARK_SPEED = 100;
+        const SPARK_DAMAGE_DELAY = 3000; // 3 seconds before spark starts
+
+        // Find connected computers through cables
+        const connectedComputers = this.findConnectedComputers(infectedComputer);
+
+        if (connectedComputers.length === 0) {
+            return; // No connected computers to spread to
+        }
+
+        // Create the spark sprite
+        const spark = this.add.sprite(
+            infectedComputer.x,
+            infectedComputer.y,
+            'spark'
+        ).play('flame');
+
+        spark.setDepth(30); // Make sure spark appears above cables
+        this.physics.world.enable(spark);
+
+        // For each connected computer, create a spark that travels along the cable
+        connectedComputers.forEach(targetComputer => {
+            // Create a timer for the 3 second delay
+            this.time.addEvent({
+                delay: SPARK_DAMAGE_DELAY,
+                callback: () => {
+                    // Calculate the path along the cable
+                    const path = new Phaser.Curves.Line([
+                        infectedComputer.x,
+                        infectedComputer.y,
+                        targetComputer.x,
+                        targetComputer.y
+                    ]);
+
+                    // Clone the spark for this path
+                    const pathSpark = this.add.sprite(
+                        infectedComputer.x,
+                        infectedComputer.y,
+                        'spark'
+                    ).play('flame');
+
+                    pathSpark.setDepth(30);
+                    this.physics.world.enable(pathSpark);
+
+                    // Calculate the distance and time needed for travel
+                    const distance = Phaser.Math.Distance.Between(
+                        infectedComputer.x,
+                        infectedComputer.y,
+                        targetComputer.x,
+                        targetComputer.y
+                    );
+                    const travelTime = (distance / SPARK_SPEED) * 1000; // Convert to milliseconds
+
+                    // Create the tween to move the spark along the cable
+                    this.tweens.add({
+                        targets: pathSpark,
+                        x: targetComputer.x,
+                        y: targetComputer.y,
+                        duration: travelTime,
+                        ease: 'Linear',
+                        onComplete: () => {
+                            // When spark reaches target, infect the computer if not protected
+                            this.infectComputer(targetComputer, pathSpark);
+                        }
+                    });
+                },
+                callbackScope: this
+            });
+        });
+    }
+
+    // Helper method to find computers connected by cables
+    findConnectedComputers(sourceComputer) {
+        const connectedComputers = [];
+
+        // Get all computers that have cables connecting to the source computer
+        this.levelCompArr.forEach(computer => {
+            if (computer !== sourceComputer) {
+                // Check if there's a cable between these computers
+                const cable = this.findCable(sourceComputer, computer);
+                if (cable) {
+                    connectedComputers.push(computer);
+                }
+            }
+        });
+
+        return connectedComputers;
+    }
+
+    // Helper method to find a cable between two computers
+    findCable(comp1, comp2) {
+        // This would need to be adapted based on how you're storing cable information
+        // For now, we'll assume cables are stored in a cables array
+        return this.cables.find(cable =>
+            (cable.start === comp1 && cable.end === comp2) ||
+            (cable.start === comp2 && cable.end === comp1)
+        );
+    }
+
+    // Helper method to infect a computer
+    infectComputer(computer, spark) {
+        // Check if the computer isn't already infected and doesn't have protection
+        const os = computer.getAt(1); // Get the OS sprite from the container
+
+        if (os && os.texture.key !== "wingdows") {
+            // Store the original OS
+            const originalOS = os.texture.key;
+
+            // Replace with Wingdows
+            computer.removeAt(1);
+            const wingdows = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "wingdows");
+            computer.addAt(wingdows, 1);
+
+            // Play infection sound
+            this.sound.play('winding');
+
+            // Create a visual effect for the infection
+            const infectEffect = this.add.sprite(computer.x, computer.y, 'spark')
+                .play('flame')
+                .setDepth(35);
+
+            // Remove the effect after animation
+            this.time.addEvent({
+                delay: 1000,
+                callback: () => {
+                    infectEffect.destroy();
+                },
+                callbackScope: this
+            });
+        }
+
+        // Destroy the spark sprite
+        spark.destroy();
+    }
+
+    monitorInfectedComputers() {
+        // Check every second for computers that have been infected
+        this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this.levelCompArr.forEach(computer => {
+                    const os = computer.getAt(1);
+                    if (os && os.texture.key === "wingdows") {
+                        // If computer doesn't have a spark timer, start one
+                        if (!computer.getData('sparkTimer')) {
+                            computer.setData('sparkTimer', this.time.now);
+                        } else if (this.time.now - computer.getData('sparkTimer') >= 3000) {
+                            // If 3 seconds have passed, create spark
+                            this.createSpark(computer);
+                            // Reset timer
+                            computer.setData('sparkTimer', null);
+                        }
+                    } else {
+                        // Reset timer if computer is no longer infected
+                        computer.setData('sparkTimer', null);
+                    }
+                });
+            },
+        callbackScope: this,
+        loop: true
+        });
     }
 }

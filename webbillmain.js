@@ -1,6 +1,6 @@
 /*
  WebBill 
-Copyright (C) 2021  Aldemir Akpinar <aldemir.akpinar@gmail.com>
+Copyright (C) 2025  Aldemir Akpinar <aldemir.akpinar@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import webBill from './webbill.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -25,9 +26,17 @@ const config = {
     // backgroundColor: '#4488aa',
     physics: {
         default: 'arcade',
+        arcade: {
+            gravity: { y: 0 }, // No gravity unless needed
+            debug: false
+        }
     },
     scene: [ gameMenu, webBill ],
     version: 0.1
     };
 
-let game = new Phaser.Game(config);
+try {
+    let game = new Phaser.Game(config);
+} catch (error) {
+    console.error('Failed to initialize game:', error);
+}

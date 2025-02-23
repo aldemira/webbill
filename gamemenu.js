@@ -1,6 +1,6 @@
 /*
  WebBill
-Copyright (C) 2022  Aldemir Akpinar <aldemir.akpinar@gmail.com>
+Copyright (C) 2025  Aldemir Akpinar <aldemir.akpinar@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -238,15 +238,11 @@ class gameMenu extends baseScene
 
     muteSound()
     {
-        let myIcon = '';
-        game.sound.mute = !game.sound.mute;
-        if (game.sound.mute) {
-            myIcon = "volume-mute";
-        } else {
-            myIcon = "volume-unmute";
-        }
+        this.game.sound.mute = !this.game.sound.mute;
+        this.volContainer.getAt(2).setTexture(this.game.sound.mute ? 'volume-mute' : 'volume-unmute');
         // this.volImg.setTexture(myIcon);
         // 0 & 1 are graphics for shadows
-        this.parentContainer.getAt(2).setTexture(myIcon);
     }
 }
+
+export default gameMenu;

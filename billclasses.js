@@ -3,5 +3,8 @@ class billDies extends Phaser.GameObjects.Sprite{
             super(scene,x,y,"explosive");
             scene.add.existing(this);
             this.play("billDAnim");
+            this.once('animationcomplete', () => {
+                this.destroy();
+            });
         }
 }
