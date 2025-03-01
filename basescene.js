@@ -27,15 +27,15 @@ class baseScene extends Phaser.Scene
     {
         // Load images with error handling
         const assets = [
-            ['billL0', 'assets/images/billL_0.png'],
-            ['billL1', 'assets/images/billL_1.png'],
-            ['billL2', 'assets/images/billL_2.png'],
-            ['billR0', 'assets/images/billR_0.png'],
-            ['billR1', 'assets/images/billR_1.png'],
-            ['billR2', 'assets/images/billR_2.png'],
-            ['wingdows', 'assets/images/wingdows.png'],
-            ['volume-unmute', 'assets/images/volume-high.png'],
-            ['volume-mute', 'assets/images/volume-muted.png']
+            ['billL0', 'images/billL_0.png'],
+            ['billL1', 'images/billL_1.png'],
+            ['billL2', 'images/billL_2.png'],
+            ['billR0', 'images/billR_0.png'],
+            ['billR1', 'images/billR_1.png'],
+            ['billR2', 'images/billR_2.png'],
+            ['wingdows', 'images/wingdows.png'],
+            ['volume-unmute', 'images/volume-high.png'],
+            ['volume-mute', 'images/volume-muted.png']
         ];
         assets.forEach(([key, path]) => this.load.image(key, path));
         this.load.on('filecomplete', (key) => console.log(`Loaded: ${key}`));

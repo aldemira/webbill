@@ -40,9 +40,4 @@ const config = {
     version: 0.1
     };
 
-try {
-    let game = new Phaser.Game(config);
-} catch (error) {
-    console.error('Failed to initialize game:', error);
-}
-
+var game = new Phaser.Game(config);

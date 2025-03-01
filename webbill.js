@@ -16,7 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import baseScene from './basescene.js'
+import baseScene from './basescene.js';
+import wmaker from './wmaker.js';
 
 class webBill extends baseScene
 {
@@ -27,6 +28,7 @@ class webBill extends baseScene
     {
         super('webBill');
 
+        this.cables = [];
         this.curLevel = 0;
         this.maxComputers = 20;
         this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
@@ -160,8 +162,8 @@ class webBill extends baseScene
         // TODO make sure computers don't overlap
         for(var i = 0; i<curCompNum;i++) {
             cpuIndex = Math.floor(Math.random() * this.computers.length);
-            virtCanvasX = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
-            virtCanvasY = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+            virtCanvasX = Phaser.Math.Between(this.game.config.width * 0.1, this.game.config.width * 0.9);
+            virtCanvasY = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
             var tmpComp = this.add.image(0, 0, this.computers[cpuIndex]);
             var tmpOS = '';
             this.levelCompArr[i] = this.add.container(virtCanvasX,virtCanvasY, [ tmpComp ]);
@@ -233,20 +235,20 @@ class webBill extends baseScene
             let xory = Phaser.Math.Between(0,1);
             let randComp = Phaser.Math.Between(0, this.computers.length);
             if (xory == 0) {
-                var billStartPointY = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+                var billStartPointY = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
                 var billStartPointX = -30;
                 var billImage = 'billR0';
                 var billAnim = 'billRAnim';
             } else {
-                var billStartPoint = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
-                if ( billStartPoint >= game.config.width / 2 ) {
+                var billStartPoint = Phaser.Math.Between(this.game.config.width * 0.1, this.game.config.width * 0.9);
+                if ( billStartPoint >= this.game.config.width / 2 ) {
                     var billImage = 'billL0';
                     var billAnim = 'billLAnim';
                 } else {
                     var billImage = 'billR0';
                     var billAnim = 'billRAnim';
                 }
-                var billStartPointX = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+                var billStartPointX = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
                 var billStartPointY = -30;
             }
 
@@ -309,10 +311,10 @@ class webBill extends baseScene
         const menuStyle = {fontFamily: "Menlo Regular", fontSize: 12, fill: "#000"};
         let bottomBarGraph = this.add.graphics();
         let alpha = 0.5 + ((0 / 10) * 0.5);
-        let bottomBar = this.add.container(0, game.config.height);
+        let bottomBar = this.add.container(0, this.game.config.height);
         bottomBarGraph.fillStyle(0x787878, alpha);
-        // let outerRect = graphics.fillRect(0, game.config.height - 40, game.config.width, 40);
-        let outerRect = bottomBarGraph.fillRect(0, -40, game.config.width, 40);
+        // let outerRect = graphics.fillRect(0, this.game.config.height - 40, this.game.config.width, 40);
+        let outerRect = bottomBarGraph.fillRect(0, -40, this.game.config.width, 40);
         bottomBar.add(outerRect);
 
         // Scoreboard
@@ -327,7 +329,7 @@ class webBill extends baseScene
         let menuOuterRectShadow = bottomBarGraph.strokeRect(2, -33, 48, 28).setDepth(3);
         bottomBar.add(menuOuterRectShadow);
 
-        this.timeText = this.add.text(game.config.width - 50, -25, this.timeString, menuStyle).setDepth(2);
+        this.timeText = this.add.text(this.game.config.width - 50, -25, this.timeString, menuStyle).setDepth(2);
         bottomBar.add(this.timeText);
 
 
@@ -346,7 +348,7 @@ class webBill extends baseScene
             myIcon = "volume-unmute";
         }
 
-        this.volImg = this.add.image(game.config.width-70, -20, myIcon)
+        this.volImg = this.add.image(this.game.config.width-70, -20, myIcon)
             .setDisplaySize(24,24)
             .setInteractive()
             .setDepth(2)
@@ -355,8 +357,8 @@ class webBill extends baseScene
 
         let menuGraph = this.add.graphics();
         menuGraph.fillStyle(0x787878, alpha);
-        // startContainer = this.add.container(5,game.config.height-100);
-        let startContainer = this.add.container(2,game.config.height-202).setVisible(false);
+        // startContainer = this.add.container(5,this.game.config.height-100);
+        let startContainer = this.add.container(2,this.game.config.height-202).setVisible(false);
         let startMenu = menuGraph.fillRect(0, -40, 100, 200);
         startContainer.add(startMenu);
         startContainer.add(this.add.text(30, 138, "Shutdown", menuStyle)
@@ -483,11 +485,11 @@ class webBill extends baseScene
             let x = 0;
             let y = 0;
             if (xory == 0 ) {
-                x = Phaser.Math.Between(game.config.width * 0.1, game.config.width * 0.9);
+                x = Phaser.Math.Between(this.game.config.width * 0.1, this.game.config.width * 0.9);
                 y = -30;
             } else {
                 x = -30;
-                y = Phaser.Math.Between(game.config.height * 0.1, game.config.height * 0.9);
+                y = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
             }
 
             this.physics.moveTo(myBill, x, y, 20);
@@ -515,8 +517,8 @@ class webBill extends baseScene
     muteSound()
     {
         let myIcon = '';
-        game.sound.mute = !game.sound.mute;
-        if (game.sound.mute) {
+        this.game.sound.mute = !this.game.sound.mute;
+        if (this.game.sound.mute) {
             myIcon = "volume-mute";
         } else {
             myIcon = "volume-unmute";
