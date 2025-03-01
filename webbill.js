@@ -16,38 +16,42 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import baseScene from './basescene.js'
+
 class webBill extends baseScene
 {
-    this.curLevel = 0;
+
+    // this.curLevel
 
     constructor()
     {
         super('webBill');
 
-        var this.maxComputers = 20;
-        var this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
-        var this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
-        var this.MINPC = 6;
-        var this.OSOFFSETX = -9;
-        var this.OSOFFSETY = -7;
-        var this.MAXBILLS = 100;
-        var this.activeComp = '';
-        var this.activeCompNum = 0;
-        var this.deactiveCompNum = 0;
-        var this.curHorde = '';
-        var this.curBill = [];
-        var this.levelCompArr = [];
-        var this.score = 0;
-        var this.timeString = ':';
-        var this.timeText = '';
-        var this.volImg = '';
+        this.curLevel = 0;
+        this.maxComputers = 20;
+        this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
+        this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
+        this.MINPC = 6;
+        this.OSOFFSETX = -9;
+        this.OSOFFSETY = -7;
+        this.MAXBILLS = 100;
+        this.activeComp = '';
+        this.activeCompNum = 0;
+        this.deactiveCompNum = 0;
+        this.curHorde = '';
+        this.curBill = [];
+        this.levelCompArr = [];
+        this.score = 0;
+        this.timeString = ':';
+        this.timeText = '';
+        this.volImg = '';
         // this.offScreen = 0;
-        var this.billTimer = '';
-        var this.efficiency = 1;
-        var this.iteration = 1;
-        var this.aliveBills = 0;
-        var this.scoreText = '';
-        var this.offScreenBillList = [];
+        this.billTimer = '';
+        this.efficiency = 1;
+        this.iteration = 1;
+        this.aliveBills = 0;
+        this.scoreText = '';
+        this.offScreenBillList = [];
     }
 
     init(props)
@@ -376,6 +380,29 @@ class webBill extends baseScene
         }
     }
 
+    // NEW: Restore computer when OS is dragged back
+    restoreComputer(os, computer) {
+        if (os.getData('dragging')) return; // Ignore while dragging
+
+        // Check if this OS matches the computer's original OS and it's infected
+        if (this.computerOsMap.get(computer) === os.texture.key && computer.getData('infected')) {
+            // Find and destroy the Windows icon on this computer
+            this.windows.getChildren().forEach(win => {
+                if (Phaser.Math.Distance.Between(win.x, win.y, computer.x, computer.y) < 10) {
+                    win.destroy();
+                }
+            });
+
+            // Snap OS to computer and disable dragging
+            os.setPosition(computer.x, computer.y);
+            os.disableInteractive();
+            os.setDepth(1);
+
+            // Reset computer state
+            computer.setData('infected', false);
+        }
+    }
+
     update()
     {
         // super.update();
@@ -653,6 +680,7 @@ class webBill extends baseScene
             computer.removeAt(1);
             const wingdows = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "wingdows");
             computer.addAt(wingdows, 1);
+            computer.setData('infected', true);
 
             // Play infection sound
             this.sound.play('winding');
@@ -704,3 +732,5 @@ class webBill extends baseScene
         });
     }
 }
+
+export default webBill;

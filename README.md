@@ -7,6 +7,10 @@ https://aldemira.github.io/webbill/
 
 ## INSTALLATION 
 Put all the files in a web server,  and browse it!
+or
+1. Clone the repo: `git clone https://github.com/aldemira/webbill`
+2. Serve locally: `npx serve`
+3. Open in browser: `http://localhost:3000`
 
 **DISCLAMER** : I'm neither a JS developer nor a fan of javascript. So this code isn't a state of art programming. If you don't like anything about it, feel free to send a PR!
 

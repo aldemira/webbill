@@ -15,7 +15,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import webBill from './webbill.js';
+
+import gameMenu from './gameMenu.js';
+import webBill from './webBill.js';
+
+var gameMenuScene = new gameMenu();
+var webBillScene = new webBill();
 
 const config = {
     type: Phaser.AUTO,
@@ -31,7 +36,7 @@ const config = {
             debug: false
         }
     },
-    scene: [ gameMenu, webBill ],
+    scene: [ gameMenuScene, webBillScene ],
     version: 0.1
     };
 
@@ -40,3 +45,4 @@ try {
 } catch (error) {
     console.error('Failed to initialize game:', error);
 }
+

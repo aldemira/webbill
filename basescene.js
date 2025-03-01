@@ -85,3 +85,4 @@ class baseScene extends Phaser.Scene
         }
     }
 }
+export default baseScene;

@@ -196,3 +196,5 @@ class wmaker
        return myContainer;
     }
 }
+
+export default wmaker;
