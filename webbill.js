@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import baseScene from './basescene.js';
 import wmaker from './wmaker.js';
 
-class webBill extends baseScene
+export default class webBill extends baseScene
 {
 
     // this.curLevel
 
     constructor()
     {
-        super('webBill');
+        super({ key:'webBill'});
 
         this.cables = [];
         this.curLevel = 0;
@@ -734,5 +734,3 @@ class webBill extends baseScene
         });
     }
 }
-
-export default webBill;

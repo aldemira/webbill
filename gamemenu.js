@@ -18,11 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import baseScene from './basescene.js';
 import wmaker from './wmaker.js';
 
-class gameMenu extends baseScene
+export default class gameMenu extends baseScene
 {
     constructor()
     {
-        super('gameMenu');
+        super({ key: 'gameMenu' });
         this.volImg = '';
         this.mainContainer = '';
         this.volContainer = '';
@@ -246,5 +246,3 @@ class gameMenu extends baseScene
         // 0 & 1 are graphics for shadows
     }
 }
-
-export default gameMenu;

@@ -18,10 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class baseScene extends Phaser.Scene
 {
-    constructor()
-    {
-        super(baseScene);
-    }
 
     preload()
     {

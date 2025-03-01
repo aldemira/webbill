@@ -19,9 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gameMenu from './gamemenu.js';
 import webBill from './webbill.js';
 
-var gameMenuScene = new gameMenu();
-var webBillScene = new webBill();
-
 const config = {
     type: Phaser.AUTO,
     parent: 'gameContainer',
@@ -36,7 +33,7 @@ const config = {
             debug: false
         }
     },
-    scene: [ gameMenuScene, webBillScene ],
+    scene: [  gameMenu, webBill ],
     version: 0.1
     };
 
