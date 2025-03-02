@@ -268,11 +268,11 @@ export default class webBill extends baseScene
             // Kill Bill
             this.curBill[i].on('pointerdown', function() {
                 let deadBillContainer = this.curBill[i];
+                deadBillContainer.disableInteractive();
                 var deadBill = deadBillContainer.getAt(1);
                 if (deadBill == undefined ) {
                     return;
                 }
-                deadBillContainer.setData("dead", "true");
                 deadBillContainer.body.stop();
                 // tmpBill.removeInteractive();
                 // Famous last words: we should only have two object
@@ -413,13 +413,13 @@ export default class webBill extends baseScene
         } else {
             this.billTimer.remove();
         }
-        console.log("Alive bills:" + this.aliveBills + " Offscreen: " + this.offScreenBillList.length);
-        this.scoreText.text =  'Bill:%d/%d  System:%d/%d/%d  Level:' + this.curLevel.toString() + '  Score:' + this.score.toString();
+        // console.log("Alive bills:" + this.aliveBills + " Offscreen: " + this.offScreenBillList.length);
+        this.scoreText.text =  'Bill:'+ this.aliveBills +'/%d  System:%d/'+this.deactiveCompNum+'/'+this.activeCompNum+'  Level:' + this.curLevel.toString() + '  Score:' + this.score.toString();
 
-        if (this.aliveBills <= 0 ) {
-            console.log('Level done!');
-            // this.scene.pause();
+        if (this.aliveBills <= 0 && this.deactiveCompNum == 0) {
+            //console.log('Level done!');
             this.showLevelDone();
+            this.pauseGame();
         }
     }
 
@@ -529,9 +529,20 @@ export default class webBill extends baseScene
     showLevelDone()
     {
         let mainWindow = new wmaker(this);
-        let levelDoneWindow = mainWindow.createXWindow(this.game.renderer.width/2, this.game.renderer.height/2, 430, 375, 'Level Done!', false);
+        // Get canvas dimensions from the game config
+        const canvasWidth = this.sys.game.config.width;
+        const canvasHeight = this.sys.game.config.height;
+
+        const windowWidth = 430;
+        const windowHeight = 375;
+
+        // Calculate centered coordinates
+        const centerX = (canvasWidth / 4) - (windowWidth / 2);
+        const centerY = (canvasHeight / 4) - (windowHeight / 2);
+
+        let levelDoneWindow = mainWindow.createXWindow(this.game.renderer.width/2, this.game.renderer.height/2, windowWidth, windowHeight, 'Level Done!', false, 100);
         let textStyle = { fontFamily: "Menlo Regular", fill: "#000", align: "left", fontSize: "14px", backgroundColor: '#fff' };
-        let donetext = this.add.text(10, 30, 'Level 1 done!', textStyle)
+        let donetext = this.add.text(10, 30, 'Level '+ this.curLevel.toString() +' done!', textStyle)
             .setOrigin(0)
             .setDepth(1);
         levelDoneWindow.add(donetext);
@@ -539,8 +550,24 @@ export default class webBill extends baseScene
             .setInteractive()
             .setOrigin(0)
             .setDepth(1);
-        donetext.on('pointerdown', () => { this.scene.restart({level: this.curLevel+1}) });
+        donetext.on('pointerdown', () => { 
+            this.resumeGame();
+            this.scene.restart({level: this.curLevel+1}) 
+        });
         levelDoneWindow.add(donetext);
+    }
+
+    pauseGame()
+    {
+        this.anims.pauseAll();
+        this.physics.pause();
+        //this.tweens.pauseAll();
+    }
+
+    resumeGame()
+    {
+        this.anims.resumeAll();
+        this.physics.resume();
     }
 
     createSparkOld()

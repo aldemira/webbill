@@ -6,7 +6,7 @@ class wmaker
     }
 
     // Creates a dismissible gui window
-    createXWindow(x, y, windowWidth, windowHeight, windowText, hidden = false)
+    createXWindow(x, y, windowWidth, windowHeight, windowText, hidden = false, depth = 4)
     {
         // pulled of from windowmaker.org
         let lightBorder = 0xb6b6b6;
@@ -16,7 +16,7 @@ class wmaker
 
         let myContainer = this.context.add.container(x, y)
             .setSize(windowWidth, windowHeight)
-            .setDepth(4);
+            .setDepth(depth);
 
         let myTitle = this.context.add.graphics()
             .lineStyle(1, lightBorder, 1)
