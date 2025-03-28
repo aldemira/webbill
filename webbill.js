@@ -19,10 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import baseScene from './basescene.js';
 import wmaker from './wmaker.js';
 
+const OSOFFSETX = -9;
+const OSOFFSETY = -7;
+const MINPC = 6;
+const computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
+const os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
+const MAXBILLS = 100;
+const CPU_OS_MAP = {
+    "maccpu": "apple",
+    "bsdcpu": "bsd",
+    "nextcpu": "next",
+    "palmcpu": "palm",
+    "sgicpu": "sgi",
+    "suncpu": "sun",
+    // "os2cpu" needs special handling
+};
+
+
 export default class webBill extends baseScene
 {
 
-    // this.curLevel
 
     constructor()
     {
@@ -31,12 +47,6 @@ export default class webBill extends baseScene
         this.cables = [];
         this.curLevel = 0;
         this.maxComputers = 20;
-        this.computers = ["maccpu","nextcpu","sgicpu","suncpu","palmcpu","os2cpu","bsdcpu"];
-        this.os = ["wingdows", "apple", "next", "sgi", "sun", "palm", "os2", "bsd", "redhat", "hurd", "linux"];
-        this.MINPC = 6;
-        this.OSOFFSETX = -9;
-        this.OSOFFSETY = -7;
-        this.MAXBILLS = 100;
         this.activeComp = '';
         this.activeCompNum = 0;
         this.deactiveCompNum = 0;
@@ -111,8 +121,7 @@ export default class webBill extends baseScene
     create()
     {
         super.create();
-        var div = document.getElementById('gameContainer');
-        div.style.backgroundColor = "#FFFFFF"; // Window maker Default Style
+        this.cameras.main.setBackgroundColor('#FFFFFF');
 
         // Scene specific animations
         this.anims.create({
@@ -159,47 +168,36 @@ export default class webBill extends baseScene
         let cpuIndex = 0;
         // Cables to draw, formula from xbill-2.1
         let curCableNum = Math.min(this.curLevel, curCompNum/2);
-        // TODO make sure computers don't overlap
+        this.computerPhysicsGroup = this.physics.add.group()
         for(var i = 0; i<curCompNum;i++) {
-            cpuIndex = Math.floor(Math.random() * this.computers.length);
+            cpuIndex = Math.floor(Math.random() * computers.length);
             virtCanvasX = Phaser.Math.Between(this.game.config.width * 0.1, this.game.config.width * 0.9);
             virtCanvasY = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
-            var tmpComp = this.add.image(0, 0, this.computers[cpuIndex]);
-            var tmpOS = '';
-            this.levelCompArr[i] = this.add.container(virtCanvasX,virtCanvasY, [ tmpComp ]);
-            switch (this.computers[cpuIndex]) {
-                case "maccpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "apple")
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "bsdcpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "bsd");
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "nextcpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "next");
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "palmcpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "palm");
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "sgicpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "sgi");
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "suncpu":
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "sun");
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
-                case "os2cpu":
-                    var pcos = Phaser.Math.Between(6, this.os.length)
-                    tmpOS = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, this.os[pcos]);
-                    this.levelCompArr[i].add(tmpOS);
-                    break;
+            const cpuType = computers[cpuIndex];
+            var tmpComp = this.add.image(0, 0, cpuType);
+            var tmpOSImageKey = CPU_OS_MAP[cpuType];
+            var tmpOS = null;
+
+            if (tmpOSImageKey) {
+                tmpOS = this.add.sprite(OSOFFSETX, OSOFFSETY, tmpOSImageKey);
+            } else if (cpuType === "os2cpu") {
+                // Keep special logic for os2cpu
+                const pcOsIndex = Phaser.Math.Between(os.indexOf("os2"), os.length - 1); // More robust index finding
+                tmpOS = this.add.sprite(OSOFFSETX, OSOFFSETY, os[pcOsIndex]);
             }
+            this.levelCompArr[i] = this.add.container(virtCanvasX, virtCanvasY, [tmpComp]);
+            this.levelCompArr[i].add(tmpOS);
+            this.levelCompArr[i].setData('originalOS', tmpOS.texture.key); // Store original OS
+            this.levelCompArr[i].setData('infected', false);
+
             this.levelCompArr[i].setSize(55,45).setDepth(20);
             this.physics.world.enable(this.levelCompArr[i]);
+            const body = this.levelCompArr[i].body;
+            body.setCollideWorldBounds(true);
+            body.setBounce(0.6);
+            body.setDrag(100);
+            body.setVelocity(Phaser.Math.Between(-30, 30), Phaser.Math.Between(-30, 30));
+            this.computerPhysicsGroup.add(this.levelCompArr[i]);
         }
 
         for (var i = 0; i<curCableNum ; i++) {
@@ -226,14 +224,14 @@ export default class webBill extends baseScene
         // Setup Bill horde
         // curMaxBills = Math.min((8 + 3 * curLevel) * Game_scale(2));
         // Original game tries to scale number of bills according to the game board dimensions
-        let curMaxBills = Math.min((8 + 3 * this.curLevel) , this.MAXBILLS);
+        let curMaxBills = Math.min((8 + 3 * this.curLevel) , MAXBILLS);
         for(let i = 0 ; i < curMaxBills; i++) {
             // Maintain the index of off screen Bills
             this.offScreenBillList.push(i);
             // 0 add bill just behind the x axis
             // 1 add bill just behind the y axis
             let xory = Phaser.Math.Between(0,1);
-            let randComp = Phaser.Math.Between(0, this.computers.length);
+            let randComp = Phaser.Math.Between(0, computers.length);
             if (xory == 0) {
                 var billStartPointY = Phaser.Math.Between(this.game.config.height * 0.1, this.game.config.height * 0.9);
                 var billStartPointX = -30;
@@ -417,9 +415,17 @@ export default class webBill extends baseScene
         this.scoreText.text =  'Bill:'+ this.aliveBills +'/%d  System:%d/'+this.deactiveCompNum+'/'+this.activeCompNum+'  Level:' + this.curLevel.toString() + '  Score:' + this.score.toString();
 
         if (this.aliveBills <= 0 && this.deactiveCompNum == 0) {
+            var infected = false;
+            for (var i=0;i<this.levelCompArr.length;i++) {
+                if (this.levelCompArr[i].getData('infected') == true) {
+                    infected = true;
+                }
+            }
             //console.log('Level done!');
-            this.showLevelDone();
-            this.pauseGame();
+            if (infected == false) {
+                this.showLevelDone();
+                this.pauseGame();
+            }
         }
     }
 
@@ -477,7 +483,7 @@ export default class webBill extends baseScene
             myCPU.addAt(wingdows, 1);
 
             goodOS.setPosition(0, -20);
-            wingdows.setPosition(this.OSOFFSETX, this.OSOFFSETY);
+            wingdows.setPosition(OSOFFSETX, OSOFFSETY);
 
             this.sound.play('winding');
 
@@ -559,15 +565,16 @@ export default class webBill extends baseScene
 
     pauseGame()
     {
-        this.anims.pauseAll();
+        // this.anims.pauseAll();
         this.physics.pause();
-        //this.tweens.pauseAll();
+        this.tweens.pauseAll();
     }
 
     resumeGame()
     {
         this.anims.resumeAll();
         this.physics.resume();
+        this.tweens.resumeAll();
     }
 
     createSparkOld()
@@ -707,7 +714,7 @@ export default class webBill extends baseScene
 
             // Replace with Wingdows
             computer.removeAt(1);
-            const wingdows = this.add.sprite(this.OSOFFSETX, this.OSOFFSETY, "wingdows");
+            const wingdows = this.add.sprite(OSOFFSETX, OSOFFSETY, "wingdows");
             computer.addAt(wingdows, 1);
             computer.setData('infected', true);
 
